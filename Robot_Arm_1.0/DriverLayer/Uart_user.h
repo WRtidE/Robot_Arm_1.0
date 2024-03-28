@@ -10,6 +10,15 @@ void data_send_IT();
 void data_receive_IT();
 void send_packet();
 
+typedef __packed struct
+{
+  int16_t x;
+	int16_t y;
+	int16_t z;
+	
 
+} App_Data;
+
+extern App_Data app_data;
 
 #endif

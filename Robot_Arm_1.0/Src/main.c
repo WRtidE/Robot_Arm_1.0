@@ -101,6 +101,7 @@ int main(void)
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 	can_filter_init();
+	data_receive_IT();
 	remote_control_init();
   /* USER CODE END 2 */
 

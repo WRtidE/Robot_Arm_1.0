@@ -24,12 +24,12 @@ void speed_control();
 void arm_task(void const * argument)
 {
 		motor_init();
-	 data_receive_IT();
+	 
 		for(;;)
 		{		  
 			   //send_packet();
-				//data_send();
-			  //data_receive();
+				 //data_send();
+			   //data_receive();
 
 		}
 		osDelay(1);
