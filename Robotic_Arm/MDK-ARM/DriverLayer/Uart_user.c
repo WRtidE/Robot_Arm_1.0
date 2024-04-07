@@ -17,11 +17,7 @@ Control_Data data;
 //≤‚ ‘
 uint8_t flag=0;
 
-//void data_receive_IT()
-//{
-//	HAL_UART_Receive_IT(&huart6, rx_buffer_ch05,data_length);
-//  HAL_Delay(1000);
-//}
+
 void data_receive_IT()
 {
 	//Ω” ‹ø’œ–÷–∂œ

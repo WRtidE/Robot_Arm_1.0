@@ -5,6 +5,7 @@
 "robotic_arm\freertos.o"
 "robotic_arm\can.o"
 "robotic_arm\dma.o"
+"robotic_arm\tim.o"
 "robotic_arm\usart.o"
 "robotic_arm\stm32f4xx_it.o"
 "robotic_arm\stm32f4xx_hal_msp.o"
@@ -42,6 +43,7 @@
 "robotic_arm\struct_typedef.o"
 "robotic_arm\control_data.o"
 "robotic_arm\arm_task.o"
+"robotic_arm\servos.o"
 --strict --scatter "Robotic_Arm\Robotic_Arm.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

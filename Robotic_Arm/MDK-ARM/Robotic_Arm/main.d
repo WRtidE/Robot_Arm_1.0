@@ -29,6 +29,8 @@ robotic_arm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h
 robotic_arm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h
 robotic_arm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h
 robotic_arm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h
+robotic_arm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
+robotic_arm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 robotic_arm\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 robotic_arm\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
 robotic_arm\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
@@ -46,6 +48,7 @@ robotic_arm\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 robotic_arm\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 robotic_arm\main.o: ../Inc/can.h
 robotic_arm\main.o: ../Inc/dma.h
+robotic_arm\main.o: ../Inc/tim.h
 robotic_arm\main.o: ../Inc/usart.h
 robotic_arm\main.o: ../Inc/gpio.h
 robotic_arm\main.o: ./DriverLayer/Can_user.h

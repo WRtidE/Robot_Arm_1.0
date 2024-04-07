@@ -6,6 +6,8 @@
 #include "bsp_can.h"
 #include "Can_user.h"
 #include "Uart_user.h"
+#include "Servos.h"
+#include "control_data.h"
 
 //电机初始化
 void motor_init();
@@ -23,10 +25,10 @@ void speed_control();
 void arm_task(void const * argument)
 {
 		motor_init();
-	 
+	  servos_init();
 		for(;;)
 		{		  
-       osDelay(1);
+      servos_control(data.z);
 		}
 		osDelay(1);
 		

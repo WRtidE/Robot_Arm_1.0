@@ -28,6 +28,8 @@ robotic_arm\arm_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_
 robotic_arm\arm_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h
 robotic_arm\arm_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h
 robotic_arm\arm_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h
+robotic_arm\arm_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
+robotic_arm\arm_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 robotic_arm\arm_task.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 robotic_arm\arm_task.o: Task\Arm_Task.h
 robotic_arm\arm_task.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h
@@ -51,3 +53,6 @@ robotic_arm\arm_task.o: ./Bsp/bsp_can.h
 robotic_arm\arm_task.o: ./DriverLayer/Can_user.h
 robotic_arm\arm_task.o: ./DriverLayer/Uart_user.h
 robotic_arm\arm_task.o: ./DriverLayer/Uart_user.h
+robotic_arm\arm_task.o: ./Device/Servos.h
+robotic_arm\arm_task.o: ./Device/Servos.h
+robotic_arm\arm_task.o: ./App/control_data.h
