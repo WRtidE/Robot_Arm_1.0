@@ -18,8 +18,8 @@
 
 typedef struct
 {
-	int p_int[3],v_int[3],t_int[3];						//这里可根据电机数目自行修改，读取三个电机的位置、速度、转矩
-	float position[3],velocity[3],torque[3];	//三个电机的位置、速度、转矩解析存储
+	int p_int[4],v_int[4],t_int[4];						//这里可根据电机数目自行修改，读取三个电机的位置、速度、转矩
+	float position[4],velocity[4],torque[4];	//三个电机的位置、速度、转矩解析存储
 	uint8_t  Tx_Data[8];												//数据发送存储
 	uint8_t  RxData[8];												//数据接收存储
 	CAN_RxHeaderTypeDef Rx_pHeader;

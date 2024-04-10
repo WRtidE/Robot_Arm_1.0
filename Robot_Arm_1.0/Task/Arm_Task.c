@@ -30,6 +30,7 @@ void arm_task(void const * argument)
 			   //send_packet();
 				 //data_send();
 			   //data_receive();
+			HAL_Delay(1000);
 
 		}
 		osDelay(1);
@@ -49,7 +50,7 @@ void motor_init()
 	HAL_Delay(1000);	//延时1s为了给DM_MC01板可控电源电源1稳定启动
 	
 	//电机模式设置:为0为IMT模式，为1为位置速度模式，为2为速度模式
-	motor_info[0].mode = 0;  
+	motor_info[0].mode = 2;  
 	motor_info[1].mode = 0; 
 	motor_info[2].mode = 2; 
 	

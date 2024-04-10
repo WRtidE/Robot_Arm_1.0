@@ -9,9 +9,11 @@
 #include "Servos.h"
 #include "control_data.h"
 
+uint16_t num=0;
 //电机初始化
 void motor_init();
-
+//控制数据处理
+void data_operate();
 //mit控制模式
 void mit_contorl();
 void mit_rc_contorl();
@@ -28,7 +30,16 @@ void arm_task(void const * argument)
 	  servos_init();
 		for(;;)
 		{		  
-      servos_control(data.z);
+			data_operate();
+			Speed_CtrlMotor(&motor_info[0].hcan, motor_info[0].can_id, motor_info[0].target_speed);
+			HAL_Delay(1);
+			Speed_CtrlMotor(&motor_info[1].hcan, motor_info[1].can_id, motor_info[1].target_speed);
+			HAL_Delay(1);
+			Speed_CtrlMotor(&motor_info[2].hcan, 0x03, motor_info[2].target_speed);
+			HAL_Delay(1);
+			Speed_CtrlMotor(&motor_info[3].hcan, 0x04, motor_info[3].target_speed);
+			HAL_Delay(1);
+			//osDelay(1);
 		}
 		osDelay(1);
 		
@@ -38,37 +49,54 @@ void arm_task(void const * argument)
 //电机初始化
 void motor_init()
 {
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);     //开启舵机电源
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);       //开启舵机电源
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,  GPIO_PIN_RESET);     //点个灯
 	
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);     //开启电源1输出 右边
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,  GPIO_PIN_RESET);   //开启电源2输出 左边
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_4,  GPIO_PIN_SET);   //开启电源2输出 左边
 	
 	HAL_Delay(1000);	//延时1s为了给DM_MC01板可控电源电源1稳定启动
 	
+	motor_info[0].hcan =  hcan2;
+	motor_info[1].hcan =  hcan1;
+	motor_info[2].hcan =  hcan1;
+	motor_info[3].hcan =  hcan1;
+	
 	//电机模式设置:为0为IMT模式，为1为位置速度模式，为2为速度模式
-	motor_info[0].mode = 0;  
-	motor_info[1].mode = 0; 
+	motor_info[0].mode = 2;  
+	motor_info[1].mode = 2; 
 	motor_info[2].mode = 2; 
+	motor_info[3].mode = 2; 
 	
 	//设置电机id
 	motor_info[0].can_id = 0x01; 
 	motor_info[1].can_id = 0x02; 
 	motor_info[2].can_id = 0x03;
-	motor_info[2].can_id = 0x04;
+	motor_info[3].can_id = 0x04;
 
-	//电机pid 直接在串口调试助手
-//	motor_info[0].Kp =  3;
-//	motor_info[0].Ki =  0;
-//	motor_info[0].Kd =  1;
-//	motor_info[1].Kp =  0;
-//	motor_info[1].Ki =  0;
-//	motor_info[1].Kd =  1;
-	
+
 	motor_commend(motor_info[0],Data_Enable);
+	HAL_Delay(2000);
 	motor_commend(motor_info[1],Data_Enable);
+	HAL_Delay(2000);
 	motor_commend(motor_info[2],Data_Enable);
+	HAL_Delay(2000);
 	motor_commend(motor_info[3],Data_Enable);
+	HAL_Delay(2000);
+	
+
+}
+//数据处理
+void data_operate()
+{
+	for(uint8_t i = 0;i<4;i++)
+	{
+			float v_float;
+		  v_float = data.v_int[i];
+		  motor_info[i].target_speed = v_float/127;
+		  motor_info[i].target_angle = data.p_int[i];
+	
+	}
 }
 
 
@@ -82,10 +110,10 @@ void mit_contorl()
 {
 
 	MIT_CtrlMotor(&hcan1,0x02, motor_info[1].target_angle,
-																						 motor_info[1].target_speed,
-																						 motor_info[1].Kp,
-																						 motor_info[1].Kd, 
-																						 motor_info[1].target_T_ff);
+														 motor_info[1].target_speed,
+														 motor_info[1].Kp,
+														 motor_info[1].Kd, 
+														 motor_info[1].target_T_ff);
 }
 
 

@@ -8,11 +8,10 @@ void data_receive();
 
 
 //´®¿Ú6Í¨ÐÅ
-uint8_t data_length = 17;
-uint8_t rx_buffer_ch05[17];
-uint8_t tx_buffer_ch05[17];
+uint8_t data_length  = 25;
+uint8_t rx_buffer_ch05[25];
+uint8_t tx_buffer_ch05[25];
 
-App_Data app_data;
 Control_Data data;
 //²âÊÔ
 uint8_t flag=0;
@@ -51,10 +50,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 				 data.x = (rx_buffer_ch05[2]<<8)|rx_buffer_ch05[1];
 				 data.y = (rx_buffer_ch05[4]<<8)|rx_buffer_ch05[3];
 				 data.z = (rx_buffer_ch05[6]<<8)|rx_buffer_ch05[5];
+				
 				 data.v_int[0] = (rx_buffer_ch05[8]<<8)|rx_buffer_ch05[7];
 				 data.v_int[1] = (rx_buffer_ch05[10]<<8)|rx_buffer_ch05[9];
 				 data.v_int[2] = (rx_buffer_ch05[12]<<8)|rx_buffer_ch05[11];
 				 data.v_int[3] = (rx_buffer_ch05[14]<<8)|rx_buffer_ch05[13];
+				
+				 data.p_int[0] = (rx_buffer_ch05[16]<<8)|rx_buffer_ch05[15];
+				 data.p_int[1] = (rx_buffer_ch05[18]<<8)|rx_buffer_ch05[17];
+				 data.p_int[2] = (rx_buffer_ch05[20]<<8)|rx_buffer_ch05[19];
+				 data.p_int[3] = (rx_buffer_ch05[22]<<8)|rx_buffer_ch05[21];
 				
          RxState=2;
 			}

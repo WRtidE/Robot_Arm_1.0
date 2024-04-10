@@ -3,6 +3,8 @@
 
 CANx_t CAN_1,CAN_2;
 char Selection=0;
+//have a test;
+uint8_t test=0;
 
 /**
 * @brief  这里对ID为0x02、0x03、0x04的3个电机进行依次控制，在freertos.c中CAN_Send_Task任务中1ms执行一次，
@@ -244,58 +246,79 @@ void Speed_CtrlMotor(CAN_HandleTypeDef* hcan, uint16_t ID, float _vel)
 	
 	if(hcan->Instance==CAN1)
 	{
-		
-	if(HAL_CAN_GetRxMessage(&hcan1,CAN_FILTER_FIFO0,&CAN_1.Rx_pHeader,CAN_1.RxData)==HAL_OK)//获取数据
-	{
-	if(CAN_1.Rx_pHeader.StdId == 0X00)
- {
-	CAN_1.p_int[0]=(CAN_1.RxData[1]<<8)|CAN_1.RxData[2];
-	CAN_1.v_int[0]=(CAN_1.RxData[3]<<4)|(CAN_1.RxData[4]>>4);
-	CAN_1.t_int[0]=((CAN_1.RxData[4]&0xF)<<8)|CAN_1.RxData[5];
-	CAN_1.position[0] = uint_to_float(CAN_1.p_int[0], P_MIN, P_MAX, 16); // (-12.5,12.5)  位置
-	CAN_1.velocity[0] = uint_to_float(CAN_1.v_int[0], V_MIN, V_MAX, 12); // (-45.0,45.0)  速度
-	CAN_1.torque[0] = uint_to_float(CAN_1.t_int[0], T_MIN, T_MAX, 12); // (-18.0,18.0)    转矩
-	 
-	//把信息存入电机结构体中
-	for (uint16_t i = 0;i<4;i++)
-	 {
-		 if(CAN_1.RxData[0] == motor_info[i].can_id)
-		 {
-			 		 	motor_info[i].can_id   = CAN_1.RxData[0];
-						motor_info[i].position = CAN_1.position[0];
-						motor_info[i].torque   = CAN_1.velocity[0];
-						motor_info[i].velocity = CAN_1.torque[0];
-		 }
-	 }
+		  test = CAN_1.RxData[0]&0X03;
+			if(HAL_CAN_GetRxMessage(hcan,CAN_RX_FIFO0,&CAN_1.Rx_pHeader,CAN_1.RxData)==HAL_OK)//获取数据
+			{
+					if(CAN_1.RxData[0] == 0X02)
+					{
+							CAN_1.p_int[1]=(CAN_1.RxData[1]<<8)|CAN_1.RxData[2];
+							CAN_1.v_int[1]=(CAN_1.RxData[3]<<4)|(CAN_1.RxData[4]>>4);
+							CAN_1.t_int[1]=((CAN_1.RxData[4]&0xF)<<8)|CAN_1.RxData[5];
+							CAN_1.position[1] = uint_to_float(CAN_1.p_int[1], P_MIN, P_MAX, 16); // (-12.5,12.5)  位置
+							CAN_1.velocity[1] = uint_to_float(CAN_1.v_int[1], V_MIN, V_MAX, 12); // (-45.0,45.0)  速度
+							CAN_1.torque[1] = uint_to_float(CAN_1.t_int[1], T_MIN, T_MAX, 12); // (-18.0,18.0)    转矩
+               
+						  motor_info[1].can_id   = CAN_1.RxData[0];
+							motor_info[1].position = CAN_1.position[1];
+							motor_info[1].torque   = CAN_1.velocity[1];
+							motor_info[1].velocity = CAN_1.torque[1];						
+					} 
+				 if(CAN_1.RxData[0] == 0X13)
+				 {
+							CAN_1.p_int[2]=(CAN_1.RxData[1]<<8)|CAN_1.RxData[2];
+							CAN_1.v_int[2]=(CAN_1.RxData[3]<<4)|(CAN_1.RxData[4]>>4);
+							CAN_1.t_int[2]=((CAN_1.RxData[4]&0xF)<<8)|CAN_1.RxData[5];
+							CAN_1.position[2] = uint_to_float(CAN_1.p_int[2], P_MIN, P_MAX, 16); // (-12.5,12.5)  位置
+							CAN_1.velocity[2] = uint_to_float(CAN_1.v_int[2], V_MIN, V_MAX, 12); // (-45.0,45.0)  速度
+							CAN_1.torque[2] = uint_to_float(CAN_1.t_int[2], T_MIN, T_MAX, 12); // (-18.0,18.0)    转矩
+               
+						  motor_info[2].can_id   = CAN_1.RxData[0];
+							motor_info[2].position = CAN_1.position[2];
+							motor_info[2].torque   = CAN_1.velocity[2];
+							motor_info[2].velocity = CAN_1.torque[2];						
+					} 
+				 if(CAN_1.RxData[0] == 0X14)
+				 {
+							CAN_1.p_int[3]=(CAN_1.RxData[1]<<8)|CAN_1.RxData[2];
+							CAN_1.v_int[3]=(CAN_1.RxData[3]<<4)|(CAN_1.RxData[4]>>4);
+							CAN_1.t_int[3]=((CAN_1.RxData[4]&0xF)<<8)|CAN_1.RxData[5];
+							CAN_1.position[3] = uint_to_float(CAN_1.p_int[3], P_MIN, P_MAX, 16); // (-12.5,12.5)  位置
+							CAN_1.velocity[3] = uint_to_float(CAN_1.v_int[3], V_MIN, V_MAX, 12); // (-45.0,45.0)  速度
+							CAN_1.torque[3] = uint_to_float(CAN_1.t_int[3], T_MIN, T_MAX, 12); // (-18.0,18.0)    转矩
+               
+						  motor_info[3].can_id   = CAN_1.RxData[0];
+							motor_info[3].position = CAN_1.position[3];
+							motor_info[3].torque   = CAN_1.velocity[3];
+							motor_info[3].velocity = CAN_1.torque[3];						
+					} 
 
- } 
- if(CAN_1.Rx_pHeader.StdId == 0X03)
- {
-	CAN_1.p_int[1]=(CAN_1.RxData[1]<<8)|CAN_1.RxData[2];
-	CAN_1.v_int[1]=(CAN_1.RxData[3]<<4)|(CAN_1.RxData[4]>>4);
-	CAN_1.t_int[1]=((CAN_1.RxData[4]&0xF)<<8)|CAN_1.RxData[5];
-	CAN_1.position[1] = uint_to_float(CAN_1.p_int[1], P_MIN, P_MAX, 16); // (-12.5,12.5)
-	CAN_1.velocity[1] = uint_to_float(CAN_1.v_int[1], V_MIN, V_MAX, 12); // (-45.0,45.0)
-	CAN_1.torque[1] = uint_to_float(CAN_1.t_int[1], T_MIN, T_MAX, 12); // (-18.0,18.0)
-	 
-	motor_info[1].can_id   = CAN_1.RxData[0];
-	motor_info[1].position = CAN_1.position[0];
-	motor_info[1].torque   = CAN_1.velocity[0];
-	motor_info[1].velocity = CAN_1.torque[0];
+	        HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO0_MSG_PENDING);	//激活CAN中断通知					
+	     }
+		
+  }
+ 	if(hcan->Instance==CAN2)
+	{
+		
+			if(HAL_CAN_GetRxMessage(hcan,CAN_RX_FIFO0,&CAN_2.Rx_pHeader,CAN_2.RxData)==HAL_OK)//获取数据
+			{
+					if(CAN_2.RxData[0] == 0X01)
+					{
+							CAN_2.p_int[0]=(CAN_2.RxData[1]<<8)|CAN_2.RxData[2];
+							CAN_2.v_int[0]=(CAN_2.RxData[3]<<4)|(CAN_2.RxData[4]>>4);
+							CAN_2.t_int[0]=((CAN_2.RxData[4]&0xF)<<8)|CAN_2.RxData[5];
+							CAN_2.position[0] = uint_to_float(CAN_2.p_int[0], P_MIN, P_MAX, 16); // (-12.5,12.5)  位置
+							CAN_2.velocity[0] = uint_to_float(CAN_2.v_int[0], V_MIN, V_MAX, 12); // (-45.0,45.0)  速度
+							CAN_2.torque[0] = uint_to_float(CAN_2.t_int[0], T_MIN, T_MAX, 12); // (-18.0,18.0)    转矩				 
+							//把信息存入电机结构体中
+							motor_info[0].can_id   = CAN_2.RxData[0];
+							motor_info[0].position = CAN_2.position[0];
+							motor_info[0].torque   = CAN_2.velocity[0];
+							motor_info[0].velocity = CAN_2.torque[0];
+					} 
+					
+				  HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO0_MSG_PENDING); //激活CAN中断通知
+	   }
  }
-  if(CAN_1.Rx_pHeader.StdId == 0X04)
- {
-	CAN_1.p_int[2]=(CAN_1.RxData[1]<<8)|CAN_1.RxData[2];
-	CAN_1.v_int[2]=(CAN_1.RxData[3]<<4)|(CAN_1.RxData[4]>>4);
-	CAN_1.t_int[2]=((CAN_1.RxData[4]&0xF)<<8)|CAN_1.RxData[5];
-	CAN_1.position[2] = uint_to_float(CAN_1.p_int[2], P_MIN, P_MAX, 16); // (-12.5,12.5)
-	CAN_1.velocity[2] = uint_to_float(CAN_1.v_int[2], V_MIN, V_MAX, 12); // (-45.0,45.0)
-	CAN_1.torque[2] = uint_to_float(CAN_1.t_int[2], T_MIN, T_MAX, 12); // (-18.0,18.0)
- }
-		HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);	//激活CAN中断通知
-	}
-}
- 
 }
 
 

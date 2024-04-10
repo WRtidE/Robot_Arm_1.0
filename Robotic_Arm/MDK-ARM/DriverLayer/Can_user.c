@@ -23,17 +23,17 @@ void motor_commend(motor_info_t motor,uint8_t *pData)
 {
 	if(motor.mode== 0)  //MIT模式
 	{
-		CANx_SendStdData(&hcan1,motor.can_id,pData,8);	
+		CANx_SendStdData(&motor.hcan,motor.can_id,pData,8);	
 		HAL_Delay(10);
 	}
 	if(motor.mode== 1)  //位置速度模式
 	{
-		CANx_SendStdData(&hcan1,motor.can_id + 0x100,pData,8);	
+		CANx_SendStdData(&motor.hcan,motor.can_id + 0x100,pData,8);	
 		HAL_Delay(10);
 	}
 	if(motor.mode== 2) //速度模式
 	{
-		CANx_SendStdData(&hcan1,motor.can_id + 0x200,pData,8);	
+		CANx_SendStdData(&motor.hcan,motor.can_id + 0x200,pData,8);	
 		HAL_Delay(10);
 	}
 }

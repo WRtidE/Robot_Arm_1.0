@@ -10,8 +10,9 @@ extern uint8_t Data_Error_clear[8];	  //电机清除错误
 //储存电机信息
 typedef struct
 {
-    uint16_t can_id;		//ID号
-		uint16_t mode;      //设置模式为何种模式，为0为IMT模式，为1为位置速度模式，为2为速度模式
+    CAN_HandleTypeDef  hcan; //can线设置
+	  uint16_t can_id;		     //ID号
+		uint16_t mode;           //设置模式为何种模式，为0为IMT模式，为1为位置速度模式，为2为速度模式
 		
 	  //信息接收
 		float position;     //电机位置
