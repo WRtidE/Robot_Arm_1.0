@@ -30,16 +30,18 @@ void arm_task(void const * argument)
 	  servos_init();
 		for(;;)
 		{		  
-			data_operate();
-			Speed_CtrlMotor(&motor_info[0].hcan, motor_info[0].can_id, motor_info[0].target_speed);
-			HAL_Delay(1);
-			Speed_CtrlMotor(&motor_info[1].hcan, motor_info[1].can_id, motor_info[1].target_speed);
-			HAL_Delay(1);
-			Speed_CtrlMotor(&motor_info[2].hcan, 0x03, motor_info[2].target_speed);
-			HAL_Delay(1);
-			Speed_CtrlMotor(&motor_info[3].hcan, 0x04, motor_info[3].target_speed);
-			HAL_Delay(1);
-			//osDelay(1);
+			servos_control(data.z,3);
+			servos_control(data.x,4);
+//			data_operate();
+//		  Speed_CtrlMotor(&motor_info[0].hcan, motor_info[0].can_id, motor_info[0].target_speed);
+//    	HAL_Delay(1);
+//      Speed_CtrlMotor(&motor_info[1].hcan, motor_info[1].can_id, motor_info[1].target_speed);
+//      HAL_Delay(1);
+//      Speed_CtrlMotor(&motor_info[2].hcan, 0x03, motor_info[2].target_speed);
+//      HAL_Delay(1);
+//      Speed_CtrlMotor(&motor_info[3].hcan, 0x04, motor_info[3].target_speed);
+//      HAL_Delay(1);
+      osDelay(1);
 		}
 		osDelay(1);
 		
