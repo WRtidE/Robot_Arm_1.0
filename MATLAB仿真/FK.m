@@ -2,9 +2,9 @@
 clear;
 clc;
 theta1 =  0;    d1 = 250; a1 = 0;    alpha1 = pi/2;  offset1 = 0;
-theta2 =  0;    d2 = 0;   a2 = 250;  alpha2 = 0;  offset2 = pi/2;
-theta3 =  0;    d3 = 0;   a3 = 250;  alpha3 = 0;  offset3 = pi/2;
-theta4 =  0;    d4 = -45; a4 = 116;  alpha4 = -pi/2; offset4 = 0;
+theta2 =  0;    d2 = 0;   a2 = 250;  alpha2 = 0;     offset2 = pi/2;
+theta3 =  0;    d3 = 0;   a3 = 250;  alpha3 = 0;     offset3 = pi/2;
+theta4 =  0;    d4 = 0; a4 = 116;  alpha4 = -pi/2; offset4 = 0;
 theta5 =  0;    d5 = 250; a5 = 0;    alpha5 = 0;     offset5 = 0;
 
 
@@ -34,22 +34,64 @@ syms a1 a2 a3 a4 a5
 syms theta1 theta2 theta3 theta4 theta5
 syms alpha1 alpha2 alpha3 alpha4 alpha5
 
-L(1) = Link('revolute','d',d1,'a',a1,'alpha', alpha1,'offset', offset1);
-L(2) = Link('revolute','d',d2,'a',a2,'alpha', alpha2,'offset', offset2);
-L(3) = Link('revolute','d',d3,'a',a3,'alpha', alpha3,'offset', offset3);
-L(4) = Link('revolute','d',d4,'a',a4,'alpha', alpha4,'offset', offset4);
-L(5) = Link('revolute','d',d5,'a',a5,'alpha', alpha5,'offset', offset5);
-%%
-clc
 theta1 =  0;    
 theta2 =  0;    
 theta3 =  0;    
 theta4 =  0;    
 theta5 =  0; 
 
-T01 = [cos(theta1) -cos(alpha1)*sin(theta1)  sin(alpha1)*sin(theta1) a1*cos(theta1);
-       sin(theta1)  cos(alpha1)*cos(theta1) -sin(alpha1)*cos(theta1) a1*sin(theta1);
-       0            sin(alpha1)              cos(alpha1)             d1;
+alpha1 = pi/2;
+alpha1 = 0;
+alpha1 = 0;
+alpha1 = -pi/2;
+alpha1 = 0;
+
+a1 = 0;
+a2 = 250;
+a3 = 250;
+a4 = 116;
+a5 = 0;
+
+d1 = 250;
+d2 = 0;
+d3 = 0;
+d4 = 0;
+d5 = 250;
+
+
+L(1) = Link('revolute','d',d1,'a',a1,'alpha', alpha1,'offset', offset1);
+L(2) = Link('revolute','d',d2,'a',a2,'alpha', alpha2,'offset', offset2);
+L(3) = Link('revolute','d',d3,'a',a3,'alpha', alpha3,'offset', offset3);
+L(4) = Link('revolute','d',d4,'a',a4,'alpha', alpha4,'offset', offset4);
+L(5) = Link('revolute','d',d5,'a',a5,'alpha', alpha5,'offset', offset5);
+%%
+clear
+clc
+syms a2 a3 a4
+syms d1 d2 d3 d4 d5 
+syms theta1 theta2 theta3 theta4 theta5
+
+d1
+%具体数值
+
+alpha1 = 1/2;  % 因为程序中用的是cospi(),所以这里用1/2来表示pi/2
+alpha2 = 0;
+alpha3 = 0;
+alpha4 = -1/2; % 因为程序中用的是cospi(),所以这里用1/2来表示pi/2
+alpha5 = 0;
+
+a1 = 0;
+a5 = 0;
+
+d2 = 0;
+d3 = 0;
+d4 = 0;
+
+
+num = cospi(1/2)
+T01 = [cos(theta1) -cospi(alpha1)*sin(theta1)  sinpi(alpha1)*sin(theta1) a1*cos(theta1);
+       sin(theta1)  cospi(alpha1)*cos(theta1) -sinpi(alpha1)*cos(theta1) a1*sin(theta1);
+       0            sinpi(alpha1)              cospi(alpha1)             d1;
        0            0                        0                       1]
 
 %theta的计算要添加在这里
@@ -63,9 +105,9 @@ T23 = [cos(theta3+pi/2) -cos(alpha3)*sin(theta3+pi/2)  sin(alpha3)*sin(theta3+pi
        0                 sin(alpha3)                   cos(alpha3)                  d3;
        0                 0                             0                            1]
   
-T34 = [cos(theta4) -cos(alpha4)*sin(theta4)  sin(alpha4)*sin(theta4) a4*cos(theta4);
-       sin(theta4)  cos(alpha4)*cos(theta4) -sin(alpha4)*cos(theta4) a4*sin(theta4);
-       0            sin(alpha4)              cos(alpha4)             d4;
+T34 = [cos(theta4) -cospi(alpha4)*sin(theta4)  sinpi(alpha4)*sin(theta4) a4*cos(theta4);
+       sin(theta4)  cospi(alpha4)*cos(theta4) -sinpi(alpha4)*cos(theta4) a4*sin(theta4);
+       0            sinpi(alpha4)              cospi(alpha4)             d4;
        0            0                        0                       1]
 T45 = [cos(theta5) -cos(alpha5)*sin(theta5)  sin(alpha5)*sin(theta5) a5*cos(theta5);
        sin(theta5)  cos(alpha5)*cos(theta5) -sin(alpha5)*cos(theta5) a5*sin(theta5);
