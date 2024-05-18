@@ -1548,6 +1548,16 @@
               <FileType>1</FileType>
               <FilePath>.\App\control_data.c</FilePath>
             </File>
+            <File>
+              <FileName>path_planning.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\path_planning.c</FilePath>
+            </File>
+            <File>
+              <FileName>IK.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\IK.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

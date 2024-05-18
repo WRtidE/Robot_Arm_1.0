@@ -56,3 +56,4 @@ robotic_arm\arm_task.o: ./DriverLayer/Uart_user.h
 robotic_arm\arm_task.o: ./Device/Servos.h
 robotic_arm\arm_task.o: ./Device/Servos.h
 robotic_arm\arm_task.o: ./App/control_data.h
+robotic_arm\arm_task.o: ./App/path_planning.h

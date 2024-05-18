@@ -8,6 +8,15 @@
 #include "Uart_user.h"
 #include "Servos.h"
 #include "control_data.h"
+#include "path_planning.h"
+
+
+pos_data joint;
+path_message path;
+
+float theta;
+float vel;
+float acc;
 
 uint16_t num=0;
 //电机初始化
@@ -22,16 +31,20 @@ void mit_rc_contorl();
 void vp_control();
 
 //速度控制模式
-void speed_control();
+void speed_control(); 
 
+//轨迹规划（后续会考虑整个task）
+void path_planning();
+	
 void arm_task(void const * argument)
 {
-		motor_init();
-	  servos_init();
+		//motor_init();
+	  //servos_init();
+
 		for(;;)
-		{		  
-			servos_control(data.z,3);
-			servos_control(data.x,4);
+		{		 
+			//servos_control(data.z,3);
+			//servos_control(data.x,4);
 //			data_operate();
 //		  Speed_CtrlMotor(&motor_info[0].hcan, motor_info[0].can_id, motor_info[0].target_speed);
 //    	HAL_Delay(1);
@@ -46,7 +59,6 @@ void arm_task(void const * argument)
 		osDelay(1);
 		
 }
-
 
 //电机初始化
 void motor_init()
@@ -125,7 +137,49 @@ void vp_control()
 	PosSpeed_CtrlMotor(&hcan1,motor_info[0].can_id, motor_info[0].target_angle, motor_info[0].target_speed);
 }
 
-
+void path_planning()
+{
+	
+	//规划路径1
+	joint.acc_f =0;
+	joint.acc_s =0;
+	joint.theta_f = 90;
+	joint.theta_s = 10;
+	joint.t_f = 10;
+	joint.t_s = 5;
+	joint.vel_f = 0;
+	joint.vel_s = 0;
+	
+	a_path_cala(&joint,&path);
+	a_path_cala(&joint,&path);
+	for(int i =0;i<100;i++)
+	{
+		theta = path.theta[i];
+		vel   = path.vel[i];
+		acc   = path.acc[i];
+		HAL_Delay(10);
+	}
+	
+			
+	//规划路径2
+	joint.acc_f =0;
+	joint.acc_s =0;
+	joint.theta_f = 45;
+	joint.theta_s = 90;
+	joint.t_f = 15;
+	joint.t_s = 10;
+	joint.vel_f = 0;
+	joint.vel_s = 0;
+	a_path_cala(&joint,&path);
+	for(int i =0;i<100;i++)
+	{
+		theta = path.theta[i];
+		vel   = path.vel[i];
+		acc   = path.acc[i];
+		HAL_Delay(10);
+	}
+	
+}
 
 
 

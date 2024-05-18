@@ -1,0 +1,729 @@
+# 机械臂开发文档
+
+## 电控部分
+
+### 时钟树配置
+
+![时钟树配置](..\Robot_Arm_1.0\img\时钟树配置.png)
+
+### 蓝牙DMA接收
+
+![串口6配置1](..\Robot_Arm_1.0\img\串口6配置1.png)
+
+- Uart_user.c
+
+```C
+#include "stm32f4xx.h"                  // Device header
+#include "Uart_user.h"
+#include "usart.h"
+#include "control_data.h"
+
+void data_send();
+void data_receive();
+
+//串口6通信
+uint8_t data_length = 17;
+uint8_t rx_buffer_ch05[17];
+uint8_t tx_buffer_ch05[17];
+
+Control_Data data;
+
+
+void data_receive_IT()
+{
+	//接受空闲中断
+  
+	__HAL_UART_ENABLE_IT(&huart6, UART_IT_IDLE); 
+	
+	HAL_UART_Receive_DMA(&huart6, rx_buffer_ch05,data_length);
+  HAL_Delay(1000);
+}
+
+//串口接收中断
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{  
+	if(huart->Instance==USART6)
+	{	 
+   //接收蓝牙模块数据包
+      static uint8_t RxState=0;
+		
+			if(RxState==0)
+      { 
+           if(rx_buffer_ch05[0]==0xA5)
+           {
+               RxState=1;
+           } 
+			}
+      if(RxState==1)
+      {  
+				//APP数据处理
+				 data.x = (rx_buffer_ch05[2]<<8)|rx_buffer_ch05[1];
+				 data.y = (rx_buffer_ch05[4]<<8)|rx_buffer_ch05[3];
+				 data.z = (rx_buffer_ch05[6]<<8)|rx_buffer_ch05[5];
+				 data.v_int[0] = (rx_buffer_ch05[8]<<8)|rx_buffer_ch05[7];
+				 data.v_int[1] = (rx_buffer_ch05[10]<<8)|rx_buffer_ch05[9];
+				 data.v_int[2] = (rx_buffer_ch05[12]<<8)|rx_buffer_ch05[11];
+				 data.v_int[3] = (rx_buffer_ch05[14]<<8)|rx_buffer_ch05[13];
+				
+         RxState=2;
+			}
+      if(RxState==2)
+      {
+          if(rx_buffer_ch05[data_length-1]==0x5A)
+         { 
+				   RxState=0;
+				 }
+				 HAL_UART_Receive_DMA(&huart6,rx_buffer_ch05,data_length);
+			}
+		  
+	}	
+}
+```
+
+- control_data.h
+
+```c
+#ifndef __CONTROL_DATA_H
+#define __CONTROL_DATA_H
+
+typedef __packed struct
+{
+	//机械臂位置信息
+  int16_t x;
+	int16_t y;
+	int16_t z;
+	
+	//速度控制
+	int16_t v_int[4];     
+	
+	//按键信息
+	int16_t key[6];       
+		
+} Control_Data;
+
+extern Control_Data data;
+
+
+
+#endif
+
+```
+
+### SG90舵机
+
+因为TIM3定时器是APB1，根据时钟树可以知道其频率为84Mhz，所以设置为83和19999
+
+计算公式如下：
+
+![定时器计算](..\Robot_Arm_1.0\img\定时器计算.png)
+
+![舵机PWM定时器](..\Robot_Arm_1.0\img\舵机PWM定时器.png)
+
+- Servos.c
+
+```C
+#include "stm32f4xx.h" 
+#include "Servos.h"
+#include "tim.h"
+
+
+void servos_init()
+{
+	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_4);
+}
+
+//500 --0   1000 -- 45   1500 --90   2000 ---135  2500 --180 
+
+void servos_control(uint16_t angle)
+{
+	float temp;
+	temp = angle*(2500/127);
+	if(temp<0)
+	{
+		temp=-temp;
+	}
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4, temp);
+}
+
+```
+
+### 夹爪舵机
+
+![夹爪舵机](..\Robot_Arm_1.0\\img\夹爪舵机.png)
+
+### 电机can通信
+
+- Can_User.c
+
+```c
+#include "stm32f4xx.h"                  // Device header
+#include "Can_user.h"
+#include "can.h"
+#include "bsp_can.h"
+
+motor_info_t motor_info[4];
+ 
+uint8_t Data_Enable[8]     ={0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFC};		//电机使能命令
+uint8_t Data_Failure[8]    ={0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFD};		//电机失能命令
+uint8_t Data_Save_zero[8]  ={0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE};	  //电机保存零点命令
+uint8_t Data_Error_clear[8]={0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFB};	  //电机清除错误
+
+//============================电机基础命令===============================================
+
+//电机命令
+/*
+    Data_Enable        电机使能命令
+		Data_Failure			 电机失能命令
+		Data_Save_zero     电机保存零点命令
+		Data_Error_clear   电机清除错误
+*/
+void motor_commend(motor_info_t motor,uint8_t *pData)
+{
+	if(motor.mode== 0)  //MIT模式
+	{
+		CANx_SendStdData(&hcan1,motor.can_id,pData,8);	
+		HAL_Delay(10);
+	}
+	if(motor.mode== 1)  //位置速度模式
+	{
+		CANx_SendStdData(&hcan1,motor.can_id + 0x100,pData,8);	
+		HAL_Delay(10);
+	}
+	if(motor.mode== 2) //速度模式
+	{
+		CANx_SendStdData(&hcan1,motor.can_id + 0x200,pData,8);	
+		HAL_Delay(10);
+	}
+}
+//============================can相关===============================================
+//can滤波器
+void can_filter_init(void)
+{
+
+    CAN_FilterTypeDef can_filter_st;
+    can_filter_st.FilterActivation = ENABLE;
+    can_filter_st.FilterMode = CAN_FILTERMODE_IDMASK;
+    can_filter_st.FilterScale = CAN_FILTERSCALE_32BIT;
+    can_filter_st.FilterIdHigh = 0x0000;
+    can_filter_st.FilterIdLow = 0x0000;
+    can_filter_st.FilterMaskIdHigh = 0x0000;
+    can_filter_st.FilterMaskIdLow = 0x0000;
+    can_filter_st.FilterBank = 0;
+    can_filter_st.FilterFIFOAssignment = CAN_RX_FIFO0;
+    HAL_CAN_ConfigFilter(&hcan1, &can_filter_st);
+    HAL_CAN_Start(&hcan1);
+    HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+
+
+    can_filter_st.SlaveStartFilterBank = 14;
+    can_filter_st.FilterBank = 14;
+    HAL_CAN_ConfigFilter(&hcan2, &can_filter_st);
+    HAL_CAN_Start(&hcan2);
+    HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING);
+}
+
+
+
+/**
+ * @brief  发送标准ID的数据帧
+ * @param  hcan     CAN的句柄
+ * @param  ID       数据帧ID
+ * @param  pData    数组指针
+ * @param  Len      字节数0~8
+ */
+uint8_t CANx_SendStdData(CAN_HandleTypeDef* hcan,uint16_t ID,uint8_t *pData,uint16_t Len)
+{
+  static CAN_TxHeaderTypeDef   Tx_Header;
+	
+	Tx_Header.StdId=ID;
+	Tx_Header.ExtId=0;
+	Tx_Header.IDE=0;
+	Tx_Header.RTR=0;
+	Tx_Header.DLC=Len;
+	
+	
+        /*找到空的发送邮箱，把数据发送出去*/
+	if(HAL_CAN_AddTxMessage(hcan, &Tx_Header, pData, (uint32_t*)CAN_TX_MAILBOX0) != HAL_OK) //
+	{
+		if(HAL_CAN_AddTxMessage(hcan, &Tx_Header, pData, (uint32_t*)CAN_TX_MAILBOX1) != HAL_OK)
+		{
+			HAL_CAN_AddTxMessage(hcan, &Tx_Header, pData, (uint32_t*)CAN_TX_MAILBOX2);
+        }
+    }
+    return 0;
+}
+
+//======================================================================================
+
+
+```
+
+## MATLAB仿真
+
+### 机器人工具箱
+
+
+
+在网站www.petercorke.com下载机器人工具箱
+
+```
+>> rtbdemo
+```
+
+#### 建立机器人模型
+
+根据机械臂实物，建立DH表
+
+![建立DH表](..\Robot_Arm_1.0\img\建立DH表.png)
+
+然后在机器人工具箱中实现
+
+```MATLAB
+%% OUR_Manipulator
+%机械臂建模
+clear;
+clc;
+% DH表
+theta1 = 0; D1 = 0;   A1 = 0;    alpha1 = -pi/2;  offset1 = 0;
+theta2 = 0; D2 = 0;   A2 = 250;  alpha2 = 0;      offset2 = -pi/2;
+theta3 = 0; D3 = 0;   A3 = 250;  alpha3 = 0;      offset3 = pi/2;
+theta4 = 0; D4 = 0;   A4 = 0;    alpha4 = -pi/2;  offset4 = 0;
+theta5 = 0; D5 = 0;   A5 = 0;    alpha5 = 0;      offset5 = 0;
+% 创建关节
+
+
+L(1) = Link('revolute','d',D1,'a',A1,'alpha', alpha1,'offset', offset1);
+L(2) = Link('revolute','d',D2,'a',A2,'alpha', alpha2,'offset', offset2);
+L(3) = Link('revolute','d',D3,'a',A3,'alpha', alpha3,'offset', offset3);
+L(4) = Link('revolute','d',D4,'a',A4,'alpha', alpha4,'offset', offset4);
+L(5) = Link('revolute','d',D5,'a',A5,'alpha', alpha5,'offset', offset5);
+Five_dof=SerialLink(L,'name','5-dof');
+
+% 关节角度限制
+L(1).qlim = [-150,150]/180 * pi;
+L(2).qlim = [-70,90] /180 * pi;
+L(3).qlim = [-70,10]  /180 * pi;
+L(4).qlim = [-90,90]/180 * pi;
+L(5).qlim = [-180,180]/180 * pi;
+
+%查看DH表
+Five_dof.display();
+
+%查看GUI
+Five_dof.teach   
+
+%% 输出DH表
+5-dof:: 5 axis, RRRRR, stdDH, slowRNE                            
++---+-----------+-----------+-----------+-----------+-----------+
+| j |     theta |         d |         a |     alpha |    offset |
++---+-----------+-----------+-----------+-----------+-----------+
+|  1|         q1|          0|          0|    -1.5708|          0|
+|  2|         q2|          0|        250|          0|    -1.5708|
+|  3|         q3|          0|        250|          0|     1.5708|
+|  4|         q4|          0|          0|    -1.5708|          0|
+|  5|         q5|          0|          0|          0|          0|
++---+-----------+-----------+-----------+-----------+-----------+
+```
+
+![manipulator](..\Robot_Arm_1.0\img\manipulator.bmp)	
+
+#### 常用函数
+
+```matlab
+%% 旋转-->旋转矩阵
+clear;
+clc;
+%Eular Angle
+T1 = eul2tr(90,60,30) 
+T2 = trotz(90)*troty(60)*trotz(30)
+%Fixed Angle
+T3 = rpy2tr(90,60,30)
+T4 = trotz(30)*troty(60)*trotx(90)
+
+
+%% 位移-->变换矩阵
+T  =  transl(1.5,1,0.5)*trotx(30)*trotz(60) %get a transformation matrix
+P  =  transl(T)  % get P from T
+R  =  t2r(T)     % get R from T
+T1 =  r2t(R)     % get T from R 
+
+Five_dof.teach  %示教
+
+q = [0,0,0,0,0] %机械臂参数初始化
+Five_dof.plot(q)
+
+%fkine 正向运动学
+q0 = [pi/2 pi/2 0 0 0];
+T = Five_dof.fkine(q0)
+
+%fkine 逆向运动学
+q1 = Five_dof.ikine(T,'mask',[1 1 1 1 1 0])
+q2 = Five_dof.ikunc(T)
+```
+
+#### 机械臂工作空间可视化
+
+```MATLAB
+%% 机械臂工作空间可视化
+% 关节空间随机生成变量--(fkine)-->变换矩阵--(transl)-->三维坐标
+% rand() 在[0,1]中随机生成一个数
+% 随机关节空间变量 q = qmin+rand(qmax-qmin)
+
+% 定义关节限制Link.qlim
+L(1).qlim = [-150,150]/180 * pi;
+L(2).qlim = [-120,70] /180 * pi;
+L(3).qlim = [-120,10]  /180 * pi;
+L(4).qlim = [-90,90]/180 * pi;
+L(5).qlim = [-180,180]/180 * pi;
+
+% 在空间中绘制点
+num = 30000;
+for i = 1:num
+
+    q1 = L(1).qlim(1) + rand*(L(1).qlim(2) - L(1).qlim(1));
+    q2 = L(2).qlim(1) + rand*(L(2).qlim(2) - L(2).qlim(1));
+    q3 = L(3).qlim(1) + rand*(L(3).qlim(2) - L(3).qlim(1));
+    q4 = L(4).qlim(1) + rand*(L(4).qlim(2) - L(4).qlim(1));
+    q5 = L(5).qlim(1) + rand*(L(5).qlim(2) - L(5).qlim(1));
+    
+    q = [q1 q2 q3 q4 q5];
+
+    T = Five_dof.fkine(q);
+
+    P(i,:) = transl(T);
+
+end
+plot3(P(:,1),P(:,2),P(:,3),'b.','MarkerSize',1);
+```
+
+整体代码
+
+```matlab
+%% 机械臂工作空间可视化
+num = 40000;
+for i = 1:num
+
+    q1 = L(1).qlim(1) + rand*(L(1).qlim(2) - L(1).qlim(1));
+    q2 = L(2).qlim(1) + rand*(L(2).qlim(2) - L(2).qlim(1));
+    q3 = L(3).qlim(1) + rand*(L(3).qlim(2) - L(3).qlim(1));
+    q4 = L(4).qlim(1) + rand*(L(4).qlim(2) - L(4).qlim(1));
+    q5 = L(5).qlim(1) + rand*(L(5).qlim(2) - L(5).qlim(1));
+    
+    q = [q1 q2 q3 q4 q5];
+    T = Five_dof.fkine(q);
+    %Five_dof.plot(q);
+    P(i,:) = transl(T);  
+end
+
+plot3(P(:,1),P(:,2),P(:,3),'b.','MarkerSize',1);
+
+Five_dof.display();  %查看DH表
+Five_dof.teach       %查看GUI
+```
+
+![workspace](..\Robot_Arm_1.0\\img\workspace.bmp)
+
+#### 轨迹规划
+
+```MATLAB
+%% 轨迹绘制
+%给定位置：(-580,45,22) --> (75,-460,0) 
+P1 = [-580,45,22];
+P2 = [75,-460,0];
+
+t = linspace(0,2,51);
+Traj=mtraj(@tpoly,P1,P2,t);
+
+n = size(Traj,1);
+T = zeros(4,4,n);
+
+for i = 1:n
+    T(:,:, i) = transl(Traj(i,:))*troty(180);
+end
+
+Qtraj = Five_dof.ikunc(T);
+
+%Five_dof.plot(Qtraj);  %仅有演示
+%Five_dof.plot(Qtraj,'trail','b'); %留下轨迹
+Five_dof.plot(Qtraj,'movie','test.gif'); %留下轨迹
+```
+
+![traj](..\Robot_Arm_1.0\\img\traj.bmp)
+
+
+
+![trail](..\Robot_Arm_1.0\img\trail.gif)
+
+输出轨迹变化曲线
+
+```MATLAB
+%%
+hold on
+
+plot(t,Traj(:,1),'.-','LineWidth',1);
+plot(t,Traj(:,2),'.-','LineWidth',1);
+plot(t,Traj(:,3),'.-','LineWidth',1);
+
+grid on
+legend('x','y','z');
+xlabel('time');
+ylabel('position')
+```
+
+![sss](..\Robot_Arm_1.0\\img\sss.bmp)
+
+### 代码实现
+
+参考文章[【MATLAB】5DOFs机械臂运动学正逆解（MDH）-解析法实现_5dof机械臂的逆解有多少-CSDN博客](https://blog.csdn.net/qq_43557907/article/details/122707124)
+
+[协作机器人零力控制与碰撞检测技术研究 - 中国知网 (cnki.net)](https://kns.cnki.net/kcms2/article/abstract?v=vRsBqZf6HxjZ9BlY5oODBw9M817Mkui0lsxQaVzEZ9HS69p5B6Xs_ztjOrC6TiibU_bNZacbORFoD1qCV4bkqUoS9ppf9DHa921u6_Hg-PR92TBADv9c8dbOp781Ej5qZ9JggafDrE8_MysOuFeLlQ==&uniplatform=NZKPT&language=CHS)
+
+#### 正运动学FK
+
+![运动学FK](..\Robot_Arm_1.0\img\运动学FK.png)
+
+```MATLAB
+%设置theta
+theta1 =  0;    
+theta2 =  0;    
+theta3 =  0;    
+theta4 =  0;    
+theta5 =  0; 
+
+T01 = [cos(theta1) -cos(alpha1)*sin(theta1)  sin(alpha1)*sin(theta1) a1*cos(theta1);
+       sin(theta1)  cos(alpha1)*cos(theta1) -sin(alpha1)*cos(theta1) a1*sin(theta1);
+       0            sin(alpha1)              cos(alpha1)             d1;
+       0            0                        0                       1]
+
+%theta的计算要添加在这里
+T12 = [cos(theta2+pi/2) -cos(alpha2)*sin(theta2+pi/2)  sin(alpha2)*sin(theta2+pi/2) a2*cos(theta2+pi/2);
+       sin(theta2+pi/2)  cos(alpha2)*cos(theta2+pi/2) -sin(alpha2)*cos(theta2+pi/2) a2*sin(theta2+pi/2);
+       0                 sin(alpha2)                  cos(alpha2)                   d2;
+       0                 0                            0                             1]
+
+T23 = [cos(theta3+pi/2) -cos(alpha3)*sin(theta3+pi/2)  sin(alpha3)*sin(theta3+pi/2) a3*cos(theta3+pi/2);
+       sin(theta3+pi/2)  cos(alpha3)*cos(theta3+pi/2) -sin(alpha3)*cos(theta3+pi/2) a3*sin(theta3+pi/2);
+       0                 sin(alpha3)                   cos(alpha3)                  d3;
+       0                 0                             0                            1]
+  
+T34 = [cos(theta4) -cos(alpha4)*sin(theta4)  sin(alpha4)*sin(theta4) a4*cos(theta4);
+       sin(theta4)  cos(alpha4)*cos(theta4) -sin(alpha4)*cos(theta4) a4*sin(theta4);
+       0            sin(alpha4)              cos(alpha4)             d4;
+       0            0                        0                       1]
+T45 = [cos(theta5) -cos(alpha5)*sin(theta5)  sin(alpha5)*sin(theta5) a5*cos(theta5);
+       sin(theta5)  cos(alpha5)*cos(theta5) -sin(alpha5)*cos(theta5) a5*sin(theta5);
+       0            sin(alpha5)              cos(alpha5)             d5;
+       0            0                        0                       1]
+
+T05 = T01*T12*T23*T34*T45 %最终的T矩阵
+
+qi = Five_dof.ikunc(T05)  %验证角度是否正确
+q0 = [theta1 theta2 theta3 theta4 theta5]
+T = Five_dof.fkine(q0)    %与机器人工具箱得出的结论进行对比
+```
+
+经过对比验证，结果完全一致(T05为计算结果，T为函数计算结果)
+
+![FK验证](..\Robot_Arm_1.0\img\FK验证.png)
+
+计算过程中出现的BUG
+
+```matlab
+%% 当直接使用时，会出现计算结果为4967757600021511
+>>cos（pi/2）
+>>ans = 4967757600021511
+%要用
+```
+
+手稿
+
+![机械臂正解](..\Robot_Arm_1.0\img\机械臂正解.jpg)
+
+最后将正运动学封装成函数
+
+非常怪的bug，对theta2操作，就会出错？八嘎，原来是把s2写成c2了
+
+```matlab
+%% 函数定义
+theta = [0 pi/2 0 0 0];
+a =     [0 250 250 0 0];
+d =     [0 0 0 0 0];
+T = FK_calc(theta,d,a)
+
+function Get_T05 = FK_calc(theta,d,a)
+c1 = cos(theta(1));c2 = cos(theta(2)-pi/2);c3 = cos(theta(3)+pi/2);c4 = cos(theta(4));c5 = cos(theta(5));
+s1 = sin(theta(1));s2 = sin(theta(2)-pi/2);s3 = sin(theta(3)+pi/2);s4 = sin(theta(4));s5 = sin(theta(5));
+a1 = a(1);a2 = a(2);a3 = a(3);a4 = a(4);a5 = a(5);
+d1 = d(1);d2 = d(2);d3 = d(3);d4 = d(4);d5 = d(5);
+
+r11 = c5*(c4*(c1*c2*c3-c1*s2*s3)-s4*(c1*c2*s3+c1*c3*s2))+s1*s5;%
+r21 = c5*(c4*(c2*c3*s1-s1*s2*s3)-s4*(c2*s1*s3+c3*s1*s2))-c1*s5;%
+r31 = -c5*(c4*(c2*s3+c3*s2)+s4*(c2*c3-s2*s3));%
+
+r12 =  c5*s1-s5*(c4*(c1*c2*c3-c1*s2*s3)-s4*(c1*c2*s3+c1*c3*s2));
+r22 = -c1*c5-s5*(c4*(s1*c2*c3-s1*s2*s3)-s4*(c2*s1*s3+c3*s1*s2));
+r32 = s5*(c4*(c2*s3+s2*c3)+s4*(c2*c3-s2*s3));
+ 
+r13 = -c4*(c1*c2*s3+c1*c3*s2)-s4*(c1*c2*c3-c1*s2*s3);
+r23 = -c4*(c2*s1*s3+c3*s1*s2)-s4*(s1*c2*c3-s1*s2*s3);
+r33 = -c4*(c2*c3-s2*s3)+s4*(c2*s3+c3*s2);
+
+px =   a2*c1*c2 + a3*c1*c2*c3 - a3*c1*s2*s3;
+py =   a2*c2*s1 + a3*c2*c3*s1 - a3*s1*s2*s3;
+pz =  -a2*s2    - a3*c2*s3    - a3*c3*s2;
+
+Get_T05 = [r11 r12 r13 px;r21 r22 r23 py ;r31 r32 r33 pz;0 0 0 1];
+end
+
+```
+
+![函数验证](C:..\Robot_Arm_1.0\img\函数验证.png)
+
+可见结果正确
+
+#### 逆运动学IK
+
+##### 具体思路
+
+![机械臂逆解](..\Robot_Arm_1.0\img\机械臂逆解.jpg)
+
+##### 等式左边
+
+逆矩阵求法
+
+![逆矩阵](..\Robot_Arm_1.0\img\逆矩阵.png)
+
+计算逆矩阵
+
+```
+%% 计算反矩阵
+clear
+syms a2 a3 a4
+syms d1 d2 d3 d4 d5 
+syms theta1 theta2 theta3 theta4 theta5
+%矩阵T01
+T01 = [cos(theta1), 0,  sin(theta1),  0;
+       sin(theta1), 0, -cos(theta1),  0;
+                 0, 1,            0, d1;
+                 0, 0,            0,  1]
+%矩阵R01
+R01 = [cos(theta1), 0,  sin(theta1);
+       sin(theta1), 0, -cos(theta1);
+                 0, 1,            0]
+%向量P01org
+P01 = [0;0;d1]
+
+%矩阵R01转置
+R01t = R01.'
+
+%逆矩阵
+T01inv = [R01t,-R01t*P01;
+          0, 0, 0,1]
+%等式左边inv（T01）*T05
+syms r11 r12 r13 r21 r22 r23 r31 r32 r33 px py pz
+T05 = [r11 r12 r13 px;
+       r21 r22 r23 py;
+       r31 r32 r33 pz;
+       0   0   0   1];
+
+Tleft = T01inv*T05
+```
+
+计算T01的逆矩阵
+
+```MATLAB
+function Tinv = Get_Tinv(theta,d,a)
+c1 = cos(theta(1));c2 = cos(theta(2)+pi/2);c3 = cos(theta(3)+pi/2);c4 = cos(theta(4));c5 = cos(theta(5));
+s1 = sin(theta(1));s2 = sin(theta(2)+pi/2);s3 = sin(theta(3)+pi/2);s4 = sin(theta(4));s5 = sin(theta(5));
+a1 = a(1);a2 = a(2);a3 = a(3);a4 = a(4);a5 = a(5);
+d1 = d(1);d2 = d(2);d3 = d(3);d4 = d(4);d5 = d(5);
+
+T01 = [c1, 0,  s1,  0;
+       s1, 0, -c1,  0;
+       0 , 1,   0, d1;
+       0 , 0,   0,  1];
+%矩阵R01
+R01 = [c1, 0,  s1;
+       s1, 0, -c1;
+        0, 1,   0];
+%向量P01org
+P01 = [0;0;d1];
+
+%矩阵R01转置
+R01t = R01.';
+
+%逆矩阵
+Tinv = [R01t   ,-R01t*P01;
+        0, 0, 0,        1];
+end
+```
+再计算T01inv * T05
+
+```matlab
+function ans = get_left(theta,d,a)
+c1 = cos(theta(1));c2 = cos(theta(2)-pi/2);c3 = cos(theta(3)+pi/2);c4 = cos(theta(4));c5 = cos(theta(5));
+s1 = sin(theta(1));s2 = sin(theta(2)-pi/2);s3 = sin(theta(3)+pi/2);s4 = sin(theta(4));s5 = sin(theta(5));
+a1 = a(1);a2 = a(2);a3 = a(3);a4 = a(4);a5 = a(5);
+d1 = d(1);d2 = d(2);d3 = d(3);d4 = d(4);d5 = d(5);
+
+r11 = c5*(c4*(c1*c2*c3-c1*s2*s3)-s4*(c1*c2*s3+c1*c3*s2))+s1*s5;%
+r21 = c5*(c4*(c2*c3*s1-s1*s2*s3)-s4*(c2*s1*s3+c3*s1*s2))-c1*s5;%
+r31 = -c5*(c4*(c2*s3+c3*s2)+s4*(c2*c3-s2*s3));%
+
+r12 =  c5*s1-s5*(c4*(c1*c2*c3-c1*s2*s3)-s4*(c1*c2*s3+c1*c3*s2));
+r22 = -c1*c5-s5*(c4*(s1*c2*c3-s1*s2*s3)-s4*(c2*s1*s3+c3*s1*s2));
+r32 = s5*(c4*(c2*s3+s2*c3)+s4*(c2*c3-s2*s3));
+ 
+r13 = -c4*(c1*c2*s3+c1*c3*s2)-s4*(c1*c2*c3-c1*s2*s3);
+r23 = -c4*(c2*s1*s3+c3*s1*s2)-s4*(s1*c2*c3-s1*s2*s3);
+r33 = -c4*(c2*c3-s2*s3)+s4*(c2*s3+c3*s2);
+
+px =   a2*c1*c2 + a3*c1*c2*c3 - a3*c1*s2*s3;
+py =   a2*c2*s1 + a3*c2*c3*s1 - a3*s1*s2*s3;
+pz =  -a2*s2    - a3*c2*s3    - a3*c3*s2;
+
+ans = [r11*c1+r21*s1 r12*c1+r22*s1 r13*c1+r23*s1 px*c1+py*s1;
+       -r31          -r32          -r33          -pz        ;
+       r21*c1-r11*s1 r22*c1-r12*s1 r23*c1-r13*s1 py*c1-px*s1;
+       0             0             0             1          ]
+
+end
+    
+```
+
+
+
+##### 等式右边
+
+```matlab
+function Get_T15 = T15_calc(theta,d,a)
+c1 = cos(theta(1));c2 = cos(theta(2)-pi/2);c3 = cos(theta(3)+pi/2);c4 = cos(theta(4));c5 = cos(theta(5));
+s1 = sin(theta(1));s2 = sin(theta(2)-pi/2);s3 = sin(theta(3)+pi/2);s4 = sin(theta(4));s5 = sin(theta(5));
+a1 = a(1);a2 = a(2);a3 = a(3);a4 = a(4);a5 = a(5);
+d1 = d(1);d2 = d(2);d3 = d(3);d4 = d(4);d5 = d(5);
+
+q11 = c5*(c4*(c2*c3-s2*s3)-s4*(c2*s3+c3*s2));
+q21 = c5*(c4*(c2*s3+c3*s2)+s4*(c2*c3-s2*s3));
+q31 = -s5;
+
+q12 = -s5*(c4*(c2*c3-s2*s3)-s4*(c2*s3+c3*s2));
+q22 = -s5*(c4*(c2*s3+c3*s2)+s4*(c2*c3-s2*s3));
+q32 = -c5;
+
+q13 = -c4*(c2*s3+c3*s2)-s4*(c2*c3-s2*s3);
+q23 =  c4*(c2*c3-s2*s3)-s4*(c2*s3+c3*s2);
+q33 = 0;
+
+Qx = a2*c2 + a3*c2*c3 - a3*s2*s3;
+Qy = a2*s2 + a3*c2*s3 + a3*c3*s2;
+Qz = 0;
+
+Get_T15 = [q11 q12 q13 Qx;q21 q22 q23 Qy;q31 q32 q33 Qz;0 0 0 1];
+end
+```
+
+##### 解方程
+
+```matlab
+```
+

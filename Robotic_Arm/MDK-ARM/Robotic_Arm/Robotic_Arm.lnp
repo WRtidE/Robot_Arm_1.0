@@ -42,6 +42,8 @@
 "robotic_arm\bsp_can.o"
 "robotic_arm\struct_typedef.o"
 "robotic_arm\control_data.o"
+"robotic_arm\path_planning.o"
+"robotic_arm\ik.o"
 "robotic_arm\arm_task.o"
 "robotic_arm\servos.o"
 --strict --scatter "Robotic_Arm\Robotic_Arm.sct"

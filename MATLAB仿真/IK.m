@@ -3,11 +3,11 @@
 clear;
 clc;
 % DH表
-theta1 = pi/3; d1 = 0;   a1 = 0;    alpha1 = -pi/2;  offset1 = 0;
-theta2 = pi/3; d2 = 0;   a2 = 250;  alpha2 = 0;      offset2 = -pi/2;
-theta3 = pi/3; d3 = 0;   a3 = 250;  alpha3 = 0;      offset3 = pi/2;
-theta4 = pi/5; d4 = 0;   a4 = 0;    alpha4 = -pi/2;  offset4 = 0;
-theta5 = pi/4; d5 = 0;   a5 = 0;    alpha5 = 0;      offset5 = 0;
+theta1 = 0; d1 = 0;   a1 = 0;    alpha1 = -pi/2;  offset1 = 0;
+theta2 = 0; d2 = 0;   a2 = 250;  alpha2 = 0;      offset2 = -pi/2;
+theta3 = 0; d3 = 0;   a3 = 250;  alpha3 = 0;      offset3 = pi/2;
+theta4 = 0; d4 = 0;   a4 = 0;    alpha4 = -pi/2;  offset4 = 0;
+theta5 = 0; d5 = 0;   a5 = 0;    alpha5 = 0;      offset5 = 0;
 % 创建关节
 
 
@@ -18,12 +18,6 @@ L(4) = Link('revolute','d',d4,'a',a4,'alpha', alpha4,'offset', offset4);
 L(5) = Link('revolute','d',d5,'a',a5,'alpha', alpha5,'offset', offset5);
 Five_dof=SerialLink(L,'name','5-dof');
 
-% 关节角度限制
-L(1).qlim = [-150,150]/180 * pi;
-L(2).qlim = [-70,90] /180 * pi;
-L(3).qlim = [-70,10]  /180 * pi;
-L(4).qlim = [-90,90]/180 * pi;
-L(5).qlim = [-180,180]/180 * pi;
 
 %查看DH表
 Five_dof.display();
@@ -112,30 +106,38 @@ Tleft= get_left(theta,d,a)
 T    = T15_calc(theta,d,a)
 %% T0inv*T05 = T15
 % 验证函数是否正确（当等式左边=等式右边的时候，等号成立）
-theta = [0 pi/2 0 0 0];
-a =     [0 250 250 116 0];
-d =     [250 0 0 0 250];
+theta  = [0 0 0 0 0];
+a      = [0 250 250 116 0];
+d      = [250 0 0 0 250];
 
 Tinv = Get_Tinv(theta,d,a)
 T05  = FK_calc(theta,d,a)
 Tl   =  Tinv*T05
+
 T15  = T15_calc(theta,d,a)
 Tleft= get_left(theta,d,a)
-
+T05  = FK_calc(theta,d,a)
 %% 函数定义
-clear
-
-theta = [0 pi/2 0 0 0];
-a =     [0 250 250 116 0];
+clc
+theta = [pi/2 pi/6 pi/7 -pi/2 0];
+a =     [0 250 250 0 0];
 d =     [250 0 0 0 250];
-T = T15_calc(theta,d,a)
+q1 = [ 0    2.0944    0.0000   -1.0472         0];
+q2 = [ 0    2.0944         0   -1.0472         0];
+q3 = [ 0    0.5236    0.0000    0.5236         0];
+q4 = [ 0    0.5236         0    0.5236         0];
 
+T05  = FK_calc(theta,d,a)
+ik   = DOF5_ikine(T05)
+Ttest = theta
+T05  = FK_calc(Ttest,d,a)
+Five_dof.plot(Ttest)
 
 % 获得T05===========================================================================================
-theta = [0 pi/2 0 0 0];
+theta = [0 0 0 0 0];
 a =     [0 250 250 0 0];
 d =     [0 0 0 0 0];
-T = FK_calc(theta,d,a)
+T = FK_calc(theta,d,a);
 
 function Get_T05 = FK_calc(theta,d,a)
 c1 = cos(theta(1));c2 = cos(theta(2)-pi/2);c3 = cos(theta(3)+pi/2);c4 = cos(theta(4));c5 = cos(theta(5));
@@ -245,3 +247,81 @@ Qz = 0;
 
 Get_T15 = [q11 q12 q13 Qx;q21 q22 q23 Qy;q31 q32 q33 Qz;0 0 0 1];
 end
+
+%计算逆解
+%======================================================================================================================
+function theta_ikine = DOF5_ikine(T)
+
+%机械臂参数
+a2 = 250; a3 = 250;
+%T06矩阵
+r11 = T(1, 1);r12 = T(1, 2);r13 = T(1, 3);px = T(1, 4);
+r21 = T(2, 1);r22 = T(2, 2);r23 = T(2, 3);py = T(2, 4);
+r31 = T(3, 1);r32 = T(3, 2);r33 = T(3, 3);pz = T(3, 4);
+
+
+%theta1 一个解
+theta1 = atan2(py,px);
+c1 = cos(theta1);
+s1 = sin(theta1);
+%theta5 一个解
+theta5 = atan2(- r21*c1 + r11*s1,- r22*c1 + r12*s1);
+
+%theta3 两个解
+c3 = (pz^2 +px^2*c1^2+py^2*s1^2+2*px*py*c1*s1-a2^2-a3^2)/(2*a2*a3);
+s3 = sqrt(1-c3^2);
+theta3_1 =  atan2(s3,+c3);
+theta3_2 =  atan2(s3,-c3);
+%theta2 两个解
+pm  = px*c1 + py*s1;
+R   = pm^2+a2^2+pz^2-a3^2;
+Ro  = sqrt((2*pm*a2)^2+(2*pz*a2)^2);
+Phi = atan2(2*pm*a2,2*pz*a2);
+theta2_1 =  atan2(R/Ro,sqrt(1-(R/Ro)^2))-Phi;
+theta2_2 =  atan2(R/Ro,-sqrt(1-(R/Ro)^2))-Phi;
+
+a =  2*pm*a2;
+b =  2*pz*a2;
+c =  pm^2+a2^2+pz^2-a3^2;
+
+theta2_1 = atan2(b,a)+atan2(sqrt(a^2+b^2-c^2),c);
+theta2_2 = atan2(b,a)-atan2(sqrt(a^2+b^2-c^2),c);
+
+%theta4 四个解
+c234 = -r33;
+s234 = sqrt(1-r33^2);
+theta4_1 = atan2(s234,c234) -theta2_1 - theta3_1;
+theta4_2 = atan2(s234,c234) -theta2_1 - theta3_2;
+theta4_3 = atan2(s234,c234) -theta2_2 - theta3_1;
+theta4_4 = atan2(s234,c234) -theta2_2 - theta3_2;
+
+theta_ikine = [theta1 theta2_1+pi/2 theta3_1-pi/2 theta4_1 theta5;
+
+               theta1 theta2_1+pi/2 theta3_2-pi/2 theta4_2 theta5;
+               theta1 theta2_2+pi/2 theta3_1-pi/2 theta4_3 theta5;
+               theta1 theta2_2+pi/2 theta3_2-pi/2 theta4_4 theta5];
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

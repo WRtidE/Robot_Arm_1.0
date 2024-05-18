@@ -76,6 +76,7 @@ theta = [theta1 theta2 theta3 theta4 theta5];
 a =     [0 250 250 0 0];
 d =     [0 0 0 0 0];
 T2 = FK_calc(theta,d,a)
+T3 = Five_dof.fkine(theta)
 %% 获得表达式，方便写成函数
 
 %clear

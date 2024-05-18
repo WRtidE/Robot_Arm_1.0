@@ -1209,7 +1209,87 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x636F47D4)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x636F47D4)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x636F47D4)
 I (App\control_data.h)(0x66139A6E)
-F (.\Task\Arm_Task.c)(0x661D1E52)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ./Bsp -I ./DriverLayer -I ./Task -I ./App -I ./Device-I.\RTE\_Robotic_Arm-IF:\DownLoad\Keil5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IF:\DownLoad\Keil5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F446xx -DUSE_HAL_DRIVER -DSTM32F446xx-o robotic_arm\arm_task.o --omf_browse robotic_arm\arm_task.crf --depend robotic_arm\arm_task.d)
+F (.\App\path_planning.c)(0x66484477)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ./Bsp -I ./DriverLayer -I ./Task -I ./App -I ./Device-I.\RTE\_Robotic_Arm-IF:\DownLoad\Keil5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IF:\DownLoad\Keil5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F446xx -DUSE_HAL_DRIVER -DSTM32F446xx-o robotic_arm\path_planning.o --omf_browse robotic_arm\path_planning.crf --depend robotic_arm\path_planning.d)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x636F477C)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h)(0x636F477C)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x636F4780)
+I (F:\DownLoad\Keil5\ARM\ARMCC\include\stdint.h)(0x588B8344)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x636F4780)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x636F4780)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x636F4780)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x636F4780)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x636F477C)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x636F47D4)
+I (../Inc/stm32f4xx_hal_conf.h)(0x66125BB0)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x636F47D4)
+I (F:\DownLoad\Keil5\ARM\ARMCC\include\stddef.h)(0x588B8344)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x636F47D4)
+I (App\path_planning.h)(0x664840A7)
+I (../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h)(0x636F4783)
+I (../Inc/FreeRTOSConfig.h)(0x6610F812)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F/portmacro.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/task.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/list.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h)(0x636F4783)
+I (../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h)(0x636F4783)
+F (.\App\IK.c)(0x6648127C)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ./Bsp -I ./DriverLayer -I ./Task -I ./App -I ./Device-I.\RTE\_Robotic_Arm-IF:\DownLoad\Keil5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IF:\DownLoad\Keil5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F446xx -DUSE_HAL_DRIVER -DSTM32F446xx-o robotic_arm\ik.o --omf_browse robotic_arm\ik.crf --depend robotic_arm\ik.d)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x636F477C)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h)(0x636F477C)
+I (../Drivers/CMSIS/Include/core_cm4.h)(0x636F4780)
+I (F:\DownLoad\Keil5\ARM\ARMCC\include\stdint.h)(0x588B8344)
+I (../Drivers/CMSIS/Include/cmsis_version.h)(0x636F4780)
+I (../Drivers/CMSIS/Include/cmsis_compiler.h)(0x636F4780)
+I (../Drivers/CMSIS/Include/cmsis_armcc.h)(0x636F4780)
+I (../Drivers/CMSIS/Include/mpu_armv7.h)(0x636F4780)
+I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h)(0x636F477C)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x636F47D4)
+I (../Inc/stm32f4xx_hal_conf.h)(0x66125BB0)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h)(0x636F47D4)
+I (F:\DownLoad\Keil5\ARM\ARMCC\include\stddef.h)(0x588B8344)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x636F47D4)
+I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x636F47D4)
+I (App\IK.h)(0x66480CA9)
+F (.\Task\Arm_Task.c)(0x664848C6)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ./Bsp -I ./DriverLayer -I ./Task -I ./App -I ./Device-I.\RTE\_Robotic_Arm-IF:\DownLoad\Keil5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IF:\DownLoad\Keil5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F446xx -DUSE_HAL_DRIVER -DSTM32F446xx-o robotic_arm\arm_task.o --omf_browse robotic_arm\arm_task.crf --depend robotic_arm\arm_task.d)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x636F477C)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h)(0x636F477C)
 I (../Drivers/CMSIS/Include/core_cm4.h)(0x636F4780)
@@ -1264,6 +1344,7 @@ I (./DriverLayer/Can_user.h)(0x6613932F)
 I (./DriverLayer/Uart_user.h)(0x660FD841)
 I (./Device/Servos.h)(0x661D1E37)
 I (./App/control_data.h)(0x66139A6E)
+I (./App/path_planning.h)(0x664840A7)
 F (.\Device\Servos.c)(0x661D1EE0)(--c99 -c --cpu Cortex-M4.fp -g -O3 --apcs=interwork --split_sections -I ../Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ./Bsp -I ./DriverLayer -I ./Task -I ./App -I ./Device-I.\RTE\_Robotic_Arm-IF:\DownLoad\Keil5\ARM\PACK\ARM\CMSIS\5.9.0\CMSIS\Core\Include-IF:\DownLoad\Keil5\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="524" -D_RTE_ -DSTM32F446xx -DUSE_HAL_DRIVER -DSTM32F446xx-o robotic_arm\servos.o --omf_browse robotic_arm\servos.crf --depend robotic_arm\servos.d)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h)(0x636F477C)
 I (../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h)(0x636F477C)
