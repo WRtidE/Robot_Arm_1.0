@@ -27,7 +27,22 @@ Project File Date:  05/18/2024
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'F:\DownLoad\Keil5\ARM\ARMCC\Bin'
 Build target 'Robotic_Arm'
-"Robotic_Arm\Robotic_Arm.axf" - 0 Error(s), 0 Warning(s).
+compiling IK.c...
+App\IK.c(54): warning:  #1-D: last line of file ends without a newline
+  }
+App\IK.c(13): warning:  #177-D: variable "r13"  was declared but never referenced
+     float r11 = T->line1[0];float r12 = T->line1[0];float r13 = T->line1[0];float px = T->line1[0];
+App\IK.c(14): warning:  #177-D: variable "r23"  was declared but never referenced
+     float r21 = T->line2[0];float r22 = T->line2[0];float r23 = T->line2[0];float py = T->line2[0];
+App\IK.c(15): warning:  #177-D: variable "r31"  was declared but never referenced
+     float r31 = T->line3[0];float r32 = T->line3[0];float r33 = T->line3[0];float pz = T->line3[0];
+App\IK.c(15): warning:  #177-D: variable "r32"  was declared but never referenced
+     float r31 = T->line3[0];float r32 = T->line3[0];float r33 = T->line3[0];float pz = T->line3[0];
+App\IK.c: 5 warnings, 0 errors
+linking...
+Program Size: Code=14768 RO-data=592 RW-data=148 ZI-data=23804  
+FromELF: creating hex file...
+"Robotic_Arm\Robotic_Arm.axf" - 0 Error(s), 5 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -51,7 +66,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.6.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

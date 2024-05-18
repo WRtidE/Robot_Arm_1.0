@@ -52,5 +52,6 @@ robotic_arm\main.o: ../Inc/tim.h
 robotic_arm\main.o: ../Inc/usart.h
 robotic_arm\main.o: ../Inc/gpio.h
 robotic_arm\main.o: ./DriverLayer/Can_user.h
+robotic_arm\main.o: ./App/path_planning.h
 robotic_arm\main.o: ./DriverLayer/Uart_user.h
 robotic_arm\main.o: ./DriverLayer/Uart_user.h

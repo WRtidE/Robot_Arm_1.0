@@ -35,3 +35,4 @@ robotic_arm\bsp_can.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 robotic_arm\bsp_can.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 robotic_arm\bsp_can.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 robotic_arm\bsp_can.o: ./DriverLayer/Can_user.h
+robotic_arm\bsp_can.o: ./App/path_planning.h

@@ -11,8 +11,6 @@
 #include "path_planning.h"
 
 
-pos_data joint;
-path_message path;
 
 float theta;
 float vel;
@@ -40,7 +38,7 @@ void arm_task(void const * argument)
 {
 		//motor_init();
 	  //servos_init();
-
+      path_planning();
 		for(;;)
 		{		 
 			//servos_control(data.z,3);
@@ -59,7 +57,7 @@ void arm_task(void const * argument)
 		osDelay(1);
 		
 }
-
+//================================电机控制==========================================================================
 //电机初始化
 void motor_init()
 {
@@ -137,49 +135,62 @@ void vp_control()
 	PosSpeed_CtrlMotor(&hcan1,motor_info[0].can_id, motor_info[0].target_angle, motor_info[0].target_speed);
 }
 
+//================================轨迹规划===========================================================================
 void path_planning()
 {
 	
 	//规划路径1
-	joint.acc_f =0;
-	joint.acc_s =0;
-	joint.theta_f = 90;
-	joint.theta_s = 10;
-	joint.t_f = 10;
-	joint.t_s = 5;
-	joint.vel_f = 0;
-	joint.vel_s = 0;
+  motor_info[1].joint.theta_s = 10;
+	motor_info[1].joint.theta_f = 90;
+	motor_info[1].joint.vel_s   =  0;
+	motor_info[1].joint.vel_f   =  0;
+	motor_info[1].joint.acc_s   =  0;
+  motor_info[1].joint.acc_f   =  0;
+	motor_info[1].joint.t_s     =  0;
+	motor_info[1].joint.t_f     = 10;
 	
-	a_path_cala(&joint,&path);
-	a_path_cala(&joint,&path);
+	a_path_cala(&motor_info[1].joint,&motor_info[1].path);
+	a_path_cala(&motor_info[1].joint,&motor_info[1].path);
 	for(int i =0;i<100;i++)
 	{
-		theta = path.theta[i];
-		vel   = path.vel[i];
-		acc   = path.acc[i];
+		theta = motor_info[1].path.theta[i];
+		vel   = motor_info[1].path.vel[i];
+		acc   = motor_info[1].path.acc[i];
 		HAL_Delay(10);
 	}
 	
-			
 	//规划路径2
-	joint.acc_f =0;
-	joint.acc_s =0;
-	joint.theta_f = 45;
-	joint.theta_s = 90;
-	joint.t_f = 15;
-	joint.t_s = 10;
-	joint.vel_f = 0;
-	joint.vel_s = 0;
-	a_path_cala(&joint,&path);
+  motor_info[1].joint.theta_s = 90;
+	motor_info[1].joint.theta_f = 45;
+	motor_info[1].joint.vel_s   =  0;
+	motor_info[1].joint.vel_f   =  0;
+	motor_info[1].joint.acc_s   =  0;
+  motor_info[1].joint.acc_f   =  0;
+	motor_info[1].joint.t_s     = 10;
+	motor_info[1].joint.t_f     = 20;
+	
+	a_path_cala(&motor_info[1].joint,&motor_info[1].path);
+	a_path_cala(&motor_info[1].joint,&motor_info[1].path);
 	for(int i =0;i<100;i++)
 	{
-		theta = path.theta[i];
-		vel   = path.vel[i];
-		acc   = path.acc[i];
+		theta = motor_info[1].path.theta[i];
+		vel   = motor_info[1].path.vel[i];
+		acc   = motor_info[1].path.acc[i];
 		HAL_Delay(10);
-	}
-	
+	}	
 }
 
-
+//将轨迹规划参数传入joint中
+ void joint_init(pos_data *joint)
+ {
+	  //在这里应该会进行一步逆解
+	  motor_info[1].joint.theta_s = 90;
+		motor_info[1].joint.theta_f = 45;
+		motor_info[1].joint.vel_s   =  0;
+		motor_info[1].joint.vel_f   =  0;
+		motor_info[1].joint.acc_s   =  0;
+		motor_info[1].joint.acc_f   =  0;
+		motor_info[1].joint.t_s     = 10;
+		motor_info[1].joint.t_f     = 20;
+ }
 

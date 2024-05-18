@@ -51,9 +51,9 @@ robotic_arm\arm_task.o: ../Inc/main.h
 robotic_arm\arm_task.o: ../Inc/gpio.h
 robotic_arm\arm_task.o: ./Bsp/bsp_can.h
 robotic_arm\arm_task.o: ./DriverLayer/Can_user.h
+robotic_arm\arm_task.o: ./App/path_planning.h
 robotic_arm\arm_task.o: ./DriverLayer/Uart_user.h
 robotic_arm\arm_task.o: ./DriverLayer/Uart_user.h
 robotic_arm\arm_task.o: ./Device/Servos.h
 robotic_arm\arm_task.o: ./Device/Servos.h
 robotic_arm\arm_task.o: ./App/control_data.h
-robotic_arm\arm_task.o: ./App/path_planning.h
