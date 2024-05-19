@@ -49,6 +49,7 @@
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 osThreadId ArmTaskHandle;
+osThreadId KinematTaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -57,6 +58,7 @@ osThreadId ArmTaskHandle;
 
 void StartDefaultTask(void const * argument);
 void arm_task(void const * argument);
+void kinemat_task(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -111,6 +113,10 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(ArmTask, arm_task, osPriorityIdle, 0, 128);
   ArmTaskHandle = osThreadCreate(osThread(ArmTask), NULL);
 
+  /* definition and creation of KinematTask */
+  osThreadDef(KinematTask, kinemat_task, osPriorityIdle, 0, 128);
+  KinematTaskHandle = osThreadCreate(osThread(KinematTask), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -151,6 +157,24 @@ __weak void arm_task(void const * argument)
     osDelay(1);
   }
   /* USER CODE END arm_task */
+}
+
+/* USER CODE BEGIN Header_kinemat_task */
+/**
+* @brief Function implementing the KinematTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_kinemat_task */
+__weak void kinemat_task(void const * argument)
+{
+  /* USER CODE BEGIN kinemat_task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END kinemat_task */
 }
 
 /* Private application code --------------------------------------------------*/

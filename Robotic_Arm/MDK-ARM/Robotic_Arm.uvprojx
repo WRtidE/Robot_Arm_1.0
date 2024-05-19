@@ -1568,6 +1568,11 @@
               <FileType>1</FileType>
               <FilePath>.\Task\Arm_Task.c</FilePath>
             </File>
+            <File>
+              <FileName>Kinemat_Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Task\Kinemat_Task.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

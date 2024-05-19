@@ -1,32 +1,37 @@
 #ifndef __PATH_PLANNING_H
 #define __PATH_PLANNING_H
 
-typedef __packed struct
-{
-  //初始位置和最终位置
-	float theta_s;
-	float theta_f;
-	//初始速度最终速度
-	float vel_s;
-	float vel_f;
-	//初始加速度和最终加速度
-	float acc_s;
-	float acc_f;
-	//初始时间和最终时间
-	float t_s;
-	float t_f;
-		
-}pos_data;
-
+//单个电机的数据
 typedef __packed struct
 {
   //储存电机的角度、速度、加速度路径规划 
   float theta[100];
-	float vel[100];
-	float acc[100];
+	float   vel[100];
+	float   acc[100];
 	
 }path_message;
 
+//一条路径的数据
+typedef __packed struct
+{
+	//初始时间和最终时间
+	float t_s;
+	float t_f;
+	//每个电机的路径规划数据
+  path_message joint_path[5];
+}path;
 
-void a_path_cala(pos_data *joint,path_message *path);
+
+//一个点而已啦，包含5个关节的角度、速度和加速度数据
+//默认为起始点位置
+typedef __packed struct
+{
+	float theta[5];
+	float vel[5];
+	float acc[5];
+}point;
+
+
+void one_path_cala(point *points,point *pointf,path *path);
+void path_planning(point *points,point *pointf,path *path);
 #endif

@@ -30,9 +30,6 @@ typedef struct
 		float Ki;
 		float Kd;//位置微分系数
 	 
-   //关节电机轨迹规划数据 from path_planning.c
-	  pos_data     joint; //单个关节的角度设置
-    path_message path;  //经过计算后的关节轨迹
 }motor_info_t;
 
 extern motor_info_t motor_info[4]; //表示有四个电机
