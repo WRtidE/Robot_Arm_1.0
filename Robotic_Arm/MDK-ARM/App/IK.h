@@ -18,7 +18,10 @@ typedef __packed struct
    float line1[4];
 	 float line2[4];
 	 float line3[4];
-}Matrix_4;
+	 float line4[4];
+
+}Matrix_T;
+
 
 
 //T¾ØÕó½á¹¹Ìå
@@ -30,4 +33,6 @@ typedef __packed struct
 	 float res4[5]; 
 }Matrix_ans;
 
+void IK_calc(manipulator *arm,Matrix_T *T,Matrix_ans *Tans);
+	
 #endif

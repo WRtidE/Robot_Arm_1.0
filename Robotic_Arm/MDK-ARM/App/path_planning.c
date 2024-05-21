@@ -55,7 +55,6 @@ void one_path_cala(point *points,point *pointf,path *path)
 				 index++;
 		}		
 	}
-	
 }
 
 

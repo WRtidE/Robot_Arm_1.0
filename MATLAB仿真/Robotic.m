@@ -1,7 +1,7 @@
 %% Our——manipulator
 clear;
 clc;
-theta1 = 0; D1 = 250; A1 = 0;    alpha1 = pi/2;  offset1 = pi/2;
+theta1 = 0; D1 = 250; A1 = 0;    alpha1 = pi/2;  offset1 = -pi/2;
 theta2 = 0; D2 = 0;   A2 = 250;  alpha2 = 0;     offset2 = pi/2;
 theta3 = 0; D3 = 0;   A3 = 250;  alpha3 = 0;     offset3 = pi/2;
 theta4 = 0; D4 = -45; A4 = 116;  alpha4 = -pi/2; offset4 = 0;
@@ -14,7 +14,7 @@ L(3) = Link('revolute','d',D3,'a',A3,'alpha', alpha3,'offset', offset3);
 L(4) = Link('revolute','d',D4,'a',A4,'alpha', alpha4,'offset', offset4);
 L(5) = Link('revolute','d',D5,'a',A5,'alpha', alpha5,'offset', offset5);
 
-Five_dof=SerialLink(L,'name','5-dof');
+Five_dof=SerialLink(L,'name','5-dof'); %整合函数
 Five_dof.base = transl(0,0,0);
 
 L(1).qlim = [-150,150]/180 * pi;
@@ -81,8 +81,8 @@ end
 
 plot3(P(:,1),P(:,2),P(:,3),'b.','MarkerSize',1);
 %% 轨迹规划
-%给定位置：(-580,45,22) --> (75,-460,0) 
-T1 = transl(-580,45,22)*troty(180)
+%给定位置：(-580,105,22) --> (75,-460,0) 
+T1 = transl(-1000,300,200)*troty(270)
 T2 = transl(75,-460,0)*troty(180)
 
 q1 = Five_dof.ikunc(T1)
@@ -123,3 +123,71 @@ grid on
 legend('x','y','z');
 xlabel('time');
 ylabel('position')
+%% 位姿插值 irinterp（）
+T1 = transl(-45,-538,-20)*troty(180)
+T2 = transl(400,49,200)*troty(180)
+t = linspace(0,2,50);
+
+T_tpoly = trinterp(T1,T2,tpoly(0,2,50)/2);
+P_tpoly = transl(T_tpoly);
+
+%subplot(1,2,2)
+hold on
+
+plot(t,P_tpoly(:,1),'.-','LineWidth',1);
+plot(t,P_tpoly(:,2),'.-','LineWidth',1);
+plot(t,P_tpoly(:,3),'.-','LineWidth',1);
+
+grid on
+legend('x','y','z');
+xlabel('time');
+ylabel('position')
+%% 笛卡尔轨迹ctraj()
+T1 = transl(-45,-538,-20)*troty(180)
+T2 = transl(400,49,200)*troty(180)
+t = linspace(0,2,50);
+
+T_ctraj = ctraj(T1,T2,tpoly(0,2,50)/2);
+P_ctraj = transl(T_ctraj);
+
+%subplot(1,2,2)
+hold on
+
+plot(t,P_ctraj(:,1),'.-','LineWidth',1);
+plot(t,P_ctraj(:,2),'.-','LineWidth',1);
+plot(t,P_ctraj(:,3),'.-','LineWidth',1);
+
+grid on
+legend('x','y','z');
+xlabel('time');
+ylabel('position')
+%% 轨迹绘制
+%给定位置：(-580,45,22) --> (75,-460,0) 
+%！该方法会爆炸
+P1 = [-45,-538,-20];
+P2 = [400,49,200];
+P3 = [400,49,0];
+
+t1 = linspace(0,2,51);
+t2 = linspace(0,2,51);
+Traj1=mtraj(@tpoly,P1,P2,t1);
+Traj2=mtraj(@tpoly,P2,P3,t2);
+
+n1 = size(Traj1,1);
+n2 = size(Traj2,1);
+T1 = zeros(4,4,n1);
+T2 = zeros(4,4,n2);
+
+for i = 1:n1
+    T1(:,:, i) = transl(Traj1(i,:))*troty(180);
+end
+
+for i = 1:n2
+    T2(:,:, i) = transl(Traj2(i,:))*troty(180);
+end
+Qtraj1 = Five_dof.ikunc(T1);
+Qtraj2 = Five_dof.ikunc(T2);
+Five_dof.plot(Qtraj1);  %仅有演示
+Five_dof.plot(Qtraj2);  %仅有演示
+%Five_dof.plot(Qtraj,'trail','b'); %留下轨迹
+%Five_dof.plot(Qtraj,'movie','trail.gif'); %留下轨迹
