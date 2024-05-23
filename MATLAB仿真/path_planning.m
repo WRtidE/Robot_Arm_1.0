@@ -1,20 +1,3 @@
-%% c语言验证
- x1=[0,1,2,3,4,5,6,7,8,9,10];
- y1=[10,10.68,14.63,23.046,35.39,49.9,64.6,76.9,85.36,89.31,89.9];%这个部分替换成—你的数据，注意一一对应
- plot(x1,y1);
- semilogy(x1,y1)%原来的折线figure 1
-
-
-x2=linspace(min(x1),max(x1));
-y2=interp1(x1,y1,x2,'cubic');
-figure
-semilogy(x2,y2)%处理后的曲线figure 2
-
- x1=linspace(min(x),max(x));
-y1=interp1(x,y,x1,'cubic');
-
-plot(x1,y1);
-
 %% OUR_Manipulator
 clc;clear;close all
 % 设置角度单位转换
@@ -148,25 +131,6 @@ vel   =c1+2*c2*power((t-ts),1)+3*c3*power((t-ts),2)+4*c4*power((t-ts),3)+5*c5*po
 acc   =2*c2+6*c3*power((t-ts),1)+12*c4*power((t-ts),2)+20*c5*power((t-ts),3)
 
 
-
-% % 绘制theta路径曲线
-% subplot(3,1,1)
-% plot(t,theta,'r','linewidth',2)
-% ylabel('position')
-% grid on
-% hold on;
-% % 绘制vel速度曲线
-% subplot(3,1,2)
-% plot(t,vel,'g','linewidth',2)
-% ylabel('velocity')
-% grid on
-% hold on;
-% %绘制加速度曲线
-% subplot(3,1,3)
-% plot(t,acc,'b','linewidth',2)
-% ylabel('acceleration')
-% grid on
-% hold on;
 motor.theta = theta;
 motor.vel   = vel;
 motor.acc   = acc;

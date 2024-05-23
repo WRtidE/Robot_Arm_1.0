@@ -27,19 +27,105 @@ L(5)=Link([ 0   d5   a5   alpha5], 'modified');
 robot=SerialLink(L,'name','robot');
 robot.teach()
 
-%q1 = [0,0,0,pi/2,0];
-q1 =  [90,-7,0,-50,-7]*pi/180;
-
+%% FK.m 正解函数测试
+q1 = [0,0,0,pi/2,0];
+%q1 =  [90,-7,0,-50,-7]*pi/180;
 T1 = robot.fkine(q1)
 T2 = FK(q1,a,d,alpha,l)
 
-
+%% IK., 逆解函数测试
 theta = IK(T2,a,d,l)
+robot.plot(theta(1,:));
+pause;
 
-for i = 1:4
-    %robot.plot(theta(i,:));
-   % pause;
-%     T = robot.fkine(theta(i,:));
-%      disp(T.t)
+%% target_calc.m 函数测试，输入xyz的值，让机械臂执行器达到指定位置
+Txyz = target_calc(155,269,0);
+theta = IK(Txyz,a,d,l)
+robot.plot(theta(1,:))
+pause;
+Txyz = target_calc(-155,-269,20);
+theta = IK(Txyz,a,d,l)
+robot.plot(theta(1,:))
+pause;
+
+
+%% path_calc 函数测试,输入目标角度和当前角度等信息，获得轨迹规划
+theta_start = [0 0 0 0 0];
+theta_final = [pi/2 pi/6 pi/7 -pi/2 0];
+v_s = [0 0 0 0 0];
+v_f = [0 0 0 0 0];
+a_s = [0 0 0 0 0];
+a_f = [0 0 0 0 0];
+t   = [0 10];
+
+T = path_calc(theta_start,theta_final,v_s,v_f,a_s,a_f,t);
+q1 = T.motor1.theta;
+q2 = T.motor2.theta;
+q3 = T.motor3.theta;
+q4 = T.motor4.theta;
+q5 = T.motor5.theta;
+
+%轨迹规划仿真
+num = 1;
+for i = 1:numel(q1)-1
+    B = [q1(num) q2(num) q3(num) q4(num) q5(num)]
+    num = num+1
+    subplot(3,2,6)
+    robot.plot(B)
 end
+%% 综合测试
+
+%输入目标x y z 坐标值
+box.x = -155;
+box.y = -269;
+h     = 10;
+
+%计算出物块相对于基坐标的矩阵
+Tbox_robo = target_calc(box.x,box.y,h);
+
+%逆解出角度
+theta = IK(Tbox_robo,a,d,l)
+
+
+% 判断是否越界,从四组解中找到一组最适合的解，主要分析关节1/2/3即可
+for i = 1:4
+ i
+ theta(i,1)
+ if((-2<theta(i,1))&&(theta(i,1)<2) ...
+  && (-1< theta(i,2))&& ( theta(i,2)< 1) ...
+  && (-1.67<theta(i,3))&&(theta(i,3)<0.9))
+
+  robot.plot(theta(i,:))
+  theta_final = theta(i,:)% 目标位置的四个转角
+
+ end
+ pause;
+end
+
+%轨迹规划
+theta_start= [0 0 0 0 0];
+v_s = [0 0 0 0 0];
+v_f = [0 0 0 0 0];
+a_s = [0 0 0 0 0];
+a_f = [0 0 0 0 0];
+t   = [0 10];
+
+T = path_calc(theta_start,theta_final,v_s,v_f,a_s,a_f,t);
+q1 = T.motor1.theta;
+q2 = T.motor2.theta;
+q3 = T.motor3.theta;
+q4 = T.motor4.theta;
+q5 = T.motor5.theta;
+
+% 绘制运动图
+num = 1;
+for i = 1:numel(q1)-1
+    B = [q1(num) q2(num) q3(num) q4(num) q5(num)]
+    num = num+1
+    robot.plot(B)
+end
+
+
+
+
 

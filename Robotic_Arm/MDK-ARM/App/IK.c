@@ -4,11 +4,6 @@
 
 float t[100];
 float pi = 3.1416;
-	 float theta11[4]={0};
-	 float theta22[4]={0};
-   float theta33[4]={0};
-	 float theta44[4]={0};
-	 float theta55[4]={0};
 
 float arctan(float sa,float ca)
 {

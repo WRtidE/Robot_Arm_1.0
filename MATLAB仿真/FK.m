@@ -1,4 +1,3 @@
-% fkine
 function [T0_tool] = FK(Angle_T,a,d,alpha,l)
 syms thetas as ds al
 %传入角度
