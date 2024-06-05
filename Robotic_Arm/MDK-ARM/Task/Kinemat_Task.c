@@ -24,23 +24,28 @@ path first_path;
 path second_path;
 
 //函数定义
-void arm_init();
+static void arm_init();
+
+//模式选择
+static void mode_choice();
+
+//轨迹规划函数
 void planning_regular();
-	
+
+
 void kinemat_task(void const * argument)
 {
    arm_init();
 
 	 while(1)
 	{
-    planning_regular();
-		//target_T_get(-155,-269,10,T_target);
-    //IK_calc(T_target,T_res);
+		mode_choice();
+    //planning_regular();
 		osDelay(1);
 	}
 
 }
-
+//================================数据初始化==========================================
 void arm_init()
 {
 	//建立DH表
@@ -57,7 +62,33 @@ void arm_init()
 	arm.d[4] = 116;
 	 
 }
-
+//================================模式选择==========================================
+void mode_choice()
+{
+		if(data.start == 1)//控制总开关
+	{
+			if(data.mode == 1)//模式选择
+					{
+						
+					}
+					else if(data.mode == 2)
+					{
+						planning_regular();
+					}
+					else if(data.mode == 3)
+					{
+						
+					}
+			else
+			{
+			}
+	}
+	else
+	{
+		
+	}
+}
+////================================轨迹规划//================================
 void planning_regular()
 {
 	//设置启动时间
@@ -77,10 +108,10 @@ void planning_regular()
 	//当前角度值
 	for(uint16_t i =0;i<5;i++)
 	{
-	  first_path.start.theta[i] = T_res[i];
+	  first_path.start.theta[i] = 0;
 	}
 	
-  //	
+	//生成轨迹并且开始执行控制
 	path_planning(&first_path);
 }
 

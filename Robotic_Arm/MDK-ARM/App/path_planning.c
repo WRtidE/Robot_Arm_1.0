@@ -2,8 +2,7 @@
 #include "path_planning.h"
 #include "cmsis_os.h"
 #include "Can_user.h"
-
-
+static float pi=3.1415;
 //===============================计算N次方==============================================================
 //計算n次方
 float power(float num,uint16_t n)
@@ -73,7 +72,15 @@ void path_planning(path *path)
 			motor_info[id].target_angle = path->joint_path[id].theta[index];
 			motor_info[id].target_speed = path->joint_path[id].vel[index];
 			motor_info[id].target_T_ff  = path->joint_path[id].acc[index];
-		}	
+		}
+		//对角度值进行处理，将电机角度与MATLAB仿真中的角度一一对应
+		//将目标角度值赋给电机		
+		motor_info[0].target_angle =  path->joint_path[0].theta[index];
+		motor_info[1].target_angle = -path->joint_path[1].theta[index];
+		motor_info[2].target_angle =  path->joint_path[2].theta[index];
+		motor_info[3].target_angle = -path->joint_path[3].theta[index]+pi/2;
+		motor_info[4].target_angle =  path->joint_path[4].theta[index];
+		
 		float delay_time = (path->t_f - path->t_s)*10;
 		osDelay(delay_time);
 	}

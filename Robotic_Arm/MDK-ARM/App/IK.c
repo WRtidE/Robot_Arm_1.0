@@ -3,7 +3,7 @@
 #include <math.h>
 
 float t[100];
-float pi = 3.1416;
+static float pi = 3.1416;
 manipulator arm;
 
 #define max(a,b) (((a) > (b)) ? (a) : (b))

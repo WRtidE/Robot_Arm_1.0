@@ -7,14 +7,19 @@ typedef __packed struct
   int16_t x;
 	int16_t y;
 	int16_t z;
-	//角度信息
-	int16_t p_int[4];
+
 	
-	//速度控制
-	int16_t v_int[4];     
-	
-	//按键信息
-	int16_t key[6];       
+	//通道值
+	int16_t channel[5];
+	 
+	//运动控制开关
+	int16_t start; 
+
+  //执行器
+  int16_t tool;
+
+ //模式选择
+  int16_t mode;	
 		
 } Control_Data;
 
