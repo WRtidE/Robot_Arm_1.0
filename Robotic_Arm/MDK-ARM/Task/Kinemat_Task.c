@@ -12,74 +12,38 @@
 
 
 //設定上電後的標準位置以及結束時安全掉電的位置
-manipulator arm;
 
-point   reset_point;
-point disable_point;
-point  via_point;
 
-path    first_path;
-path     last_path;
 
-Matrix_T T_start;
-Matrix_T T_end;
-Matrix_ans T_res_start;
-Matrix_ans T_res_end;
+
+float martx[4][4];
+float T_target[4][4];
+float T_res[5];
+float T_test[5];
+path first_path;
+path second_path;
 
 //函数定义
-void points_init();
-
-void path_init();
-
-void T_init();
-
 void arm_init();
-
+void planning_regular();
+	
 void kinemat_task(void const * argument)
 {
-
-   points_init();
-	 path_init();
-	 T_init();
-	 arm_init();
-	 IK_calc(&arm,&T_end,&T_res_end);
-	 T_res_start = T_res_end;
+   arm_init();
 
 	 while(1)
 	{
-		//IK_calc(&arm,&T_end,&T_res_end);
+    planning_regular();
+		//target_T_get(-155,-269,10,T_target);
+    //IK_calc(T_target,T_res);
+		osDelay(1);
 	}
-	path_planning(&reset_point,&via_point,&first_path);
-	 path_planning(&via_point,&disable_point,&last_path);
-}
-//初始化矩阵
-/*
-        -1         0         0      -250
-         0         1         0         0
-         0         0        -1       197
-         0         0         0         1
 
-
-   -0.2224    0.9727    0.0664   34.2267
-   -0.8114   -0.2224    0.5406  278.7539
-    0.5406    0.0664    0.8387  438.8897
-         0         0         0    1.0000
-*/
-void T_init()
-{
-//	T_end.line1[0]=-1;T_end.line1[1]= 0;T_end.line1[2]= 0;T_end.line1[3]=-250;
-//	T_end.line2[0]= 0;T_end.line2[1]= 1;T_end.line2[2]= 0;T_end.line2[3]= 0;
-//	T_end.line3[0]= 0;T_end.line3[1]= 0;T_end.line3[2]=-1;T_end.line3[3]= 197;
-//	T_end.line4[0]= 0;T_end.line4[1]= 0;T_end.line4[2]= 0;T_end.line4[3]= 1;
-	
-	T_end.line1[0]= 0.1219;T_end.line1[1]= -0.9925;T_end.line1[2]=       0;T_end.line1[3]=    0;
-	T_end.line2[0]= 0.8324;T_end.line2[1]=  0.1022;T_end.line2[2]= -0.5446;T_end.line2[3]= -280;
-	T_end.line3[0]= 0.5406;T_end.line3[1]=  0.0664;T_end.line3[2]=  0.8387;T_end.line3[3]=  438.8897;
-	T_end.line4[0]=      0;T_end.line4[1]=       0;T_end.line4[2]=       0;T_end.line4[3]=    1;
 }
 
 void arm_init()
 {
+	//建立DH表
 	arm.a[0] = 0;
 	arm.a[1] = 0;
 	arm.a[2] = 250;
@@ -91,35 +55,37 @@ void arm_init()
 	arm.d[2] = 0;
 	arm.d[3] = 0;
 	arm.d[4] = 116;
-	
+	 
 }
-//设定基础点
-void points_init()
-{
-   disable_point.theta[0] = -90;
-	 disable_point.theta[1] = 20;
-	 disable_point.theta[2] = 40;
-	 disable_point.theta[3] = 50;
-	 disable_point.theta[4] = 90;
-	
-	 via_point.theta[0] = 50;
-	 via_point.theta[1] = 40;
-	 via_point.theta[2] = 20;
-	 via_point.theta[3] = 10;
-	 via_point.theta[4] = 10;
-	
-	
-}	
 
-//设定路径
-void path_init()
+void planning_regular()
 {
-	first_path.t_f = 10;
-	first_path.t_s = 0;
+	//设置启动时间
 	
-	last_path.t_s =10;
-	last_path.t_f =20;
+	first_path.t_s = 0;
+	first_path.t_f = 10;
+	
+	//获得目标角度
+	target_T_get(-155,-269,10,T_target);
+  IK_calc(T_target,T_res);
+	
+	for(uint16_t i =0;i<5;i++)
+	{
+	  first_path.end.theta[i] = T_res[i];
+	}
+	
+	//当前角度值
+	for(uint16_t i =0;i<5;i++)
+	{
+	  first_path.start.theta[i] = T_res[i];
+	}
+	
+  //	
+	path_planning(&first_path);
 }
+
+
+
 
 
  

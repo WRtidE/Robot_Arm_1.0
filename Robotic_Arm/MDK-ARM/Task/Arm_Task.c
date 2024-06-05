@@ -11,7 +11,6 @@
 #include "path_planning.h"
 
 
-
 float theta;
 float vel;
 float acc;
@@ -34,13 +33,18 @@ void speed_control();
 //轨迹规划（后续会考虑整个task）
 void path_planning();
 	
+	
+float mat[4][4] = {0};
 void arm_task(void const * argument)
 {
 		//motor_init();
 	  //servos_init();
-     // path_planning();
+    // path_planning();
+	 
 		for(;;)
 		{		 
+			  
+			 
 			//servos_control(data.z,3);
 			//servos_control(data.x,4);
 //			data_operate();
@@ -57,6 +61,7 @@ void arm_task(void const * argument)
 		osDelay(1);
 		
 }
+
 //================================电机控制==========================================================================
 //电机初始化
 void motor_init()

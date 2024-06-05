@@ -19,19 +19,20 @@ float power(float num,uint16_t n)
 
 
 //===============================直接传入两个点，生成这两个点之间所有关节相对路径==============================================================
-void one_path_cala(point *points,point *pointf,path *path)
+//需要传入两个点的角度信息，这条轨迹的时间信息，共三个数据
+void one_path_cala(path *path)
 {
   float ts   = path->t_s;
 	float tf   = path->t_f;
 	
 	for(uint16_t i = 0;i<5;i++)
 	{
-		float q0   = points->theta[i];
-		float qf   = pointf->theta[i];
-		float dq0  = points->vel[i];
-		float dqf  = pointf->vel[i];
-		float ddq0 = points->acc[i];
-		float ddqf = pointf->acc[i];
+		float q0   = path->start.theta[i];
+		float qf   = path->end.theta[i];
+		float dq0  = path->start.vel[i];
+		float dqf  = path->end.vel[i];
+		float ddq0 = path->start.acc[i];
+		float ddqf = path->end.acc[i];
 
 		//计算轨迹五次多项式系数值
 		float a0,a1,a2,a3,a4,a5 = 0;
@@ -59,11 +60,12 @@ void one_path_cala(point *points,point *pointf,path *path)
 
 
 //===============================根据规划的路径，改变关节的target_angle==============================================================
-void path_planning(point *points,point *pointf,path *path)
+void path_planning(path *path)
  {
-	 //创建一条路径
-  one_path_cala(points,pointf,path);
+	 //创建一条路径，先计算
+  one_path_cala(path);
 	 
+	 //算完后再执行路径规划
 	for(int index =0;index<100;index++)
 	{
 		for(uint16_t id = 0;id<5;id++)
@@ -73,7 +75,7 @@ void path_planning(point *points,point *pointf,path *path)
 			motor_info[id].target_T_ff  = path->joint_path[id].acc[index];
 		}	
 		float delay_time = (path->t_f - path->t_s)*10;
-		HAL_Delay(delay_time);
+		osDelay(delay_time);
 	}
  }
 

@@ -4,10 +4,16 @@
 
 float t[100];
 float pi = 3.1416;
+manipulator arm;
 
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+
+
+//================================arctan数据处理函数================================
 float arctan(float sa,float ca)
 {
-	float eps = 0.00001;
+	float eps = 0.0001;
 	float angle = 0;
 	
 	//abs(cos) = 0 和abs(sin) = 0 的时候，让theta = 0；
@@ -34,7 +40,12 @@ float arctan(float sa,float ca)
 	}
 	else
 	{
-			angle = atan2(sa,ca);
+//	  float ca = fabsf(ca), sa = fabsf(sa);
+//    float temp1 = min(ca, sa)/max(ca, sa);
+//    float temp2 = temp1*temp1;
+//    float result = ((-0.0464964749 * temp2 + 0.15931422) * temp2 - 0.327622764) * temp2 * temp1 + temp1;
+		
+		angle = atan2f(sa,ca);
 	}
 	
 	return angle;
@@ -42,17 +53,21 @@ float arctan(float sa,float ca)
 	//abs(cos = 0 的时候，让theta = 0   
 }
 
+float Tans[4][5];
 //================================机械臂逆解函数================================
-void IK_calc(manipulator *arm,Matrix_T *T,Matrix_ans *Tans)
+void IK_calc(float (*T)[4],float *res)
 {
+	//Tans 储存获得的4个解
+	
+	
 	//机械臂参数
-  uint16_t a2 = arm->a[1]; uint16_t a3 = arm->a[2];uint16_t a4 = arm->a[3];
-	uint16_t d1 = arm->d[0]; uint16_t d5 = arm->d[4];
+  uint16_t a2 = arm.a[1]; uint16_t a3 = arm.a[2];uint16_t a4 = arm.a[3];
+	uint16_t d1 = arm.d[0]; uint16_t d5 = arm.d[4];
 	
   //T06矩阵
-   float r11 = T->line1[0];float r12 = T->line1[1];float r13 = T->line1[2];float px = T->line1[3];
-   float r21 = T->line2[0];float r22 = T->line2[1];float r23 = T->line2[2];float py = T->line2[3];
-   float r31 = T->line3[0];float r32 = T->line3[1];float r33 = T->line3[2];float pz = T->line3[3];
+   float r11 = T[0][0];float r12 = T[0][1];float r13 = T[0][2];float px = T[0][3];
+   float r21 = T[1][0];float r22 = T[1][1];float r23 = T[1][2];float py = T[1][3];
+   float r31 = T[2][0];float r32 = T[2][1];float r33 = T[2][2];float pz = T[2][3];
 	
 	
 	 //储存theta解
@@ -75,7 +90,8 @@ void IK_calc(manipulator *arm,Matrix_T *T,Matrix_ans *Tans)
    //================================theta5================================
 	 for(uint16_t i =0;i<2;i++)
 	 {
-		 theta5[i] =  arctan(r21*cos(theta1[i])-r11*sin(theta1[i]),r22*cos(theta1[i])-r12*sin(theta1[i]));
+		 theta5[i] = 1;
+		 //theta5[i] =  arctan(r21*cos(theta1[i])-r11*sin(theta1[i]),r22*cos(theta1[i])-r12*sin(theta1[i]));
 	 }
 	 
 	 theta5[2] = theta5[0];
@@ -88,8 +104,8 @@ void IK_calc(manipulator *arm,Matrix_T *T,Matrix_ans *Tans)
 		 
 		 if( ((x*x+y*y-a4*a4-a3*a3)/(2*a3*a4))>1 || ((x*x+y*y-a4*a4-a3*a3)/(2*a3*a4))<-1)
 		 {
-			   theta3[i]   = 25500000000; //表示无解
-			   theta3[i+2] = 25500000000; //表示无解
+			   theta3[i]   = 255; //表示无解
+			   theta3[i+2] = 255; //表示无解
 		 }
 		 else
 		 {
@@ -128,7 +144,7 @@ void IK_calc(manipulator *arm,Matrix_T *T,Matrix_ans *Tans)
 			
 			if(s2>1||s2<-1||c2>1||c2<-1)
 			{
-				theta2[i] = 25500000000;
+				theta2[i] = 255;
 			}	
 			else
 			{
@@ -137,7 +153,7 @@ void IK_calc(manipulator *arm,Matrix_T *T,Matrix_ans *Tans)
 		 }
 		 else
 		 {
-			 theta2[i]= 25500000000;
+			 theta2[i]= 255;
 		 }
 	 }
 	 
@@ -180,8 +196,38 @@ void IK_calc(manipulator *arm,Matrix_T *T,Matrix_ans *Tans)
 	 }
 
 	 //獲得四個解
-		Tans->res1[0]=theta1[0];Tans->res1[1]=theta2[0];Tans->res1[2]=theta3[0];Tans->res1[3]=theta4[0];Tans->res1[4]=theta5[0];
-	  Tans->res2[0]=theta1[1];Tans->res2[1]=theta2[1];Tans->res2[2]=theta3[1];Tans->res2[3]=theta4[1];Tans->res2[4]=theta5[1];
-	  Tans->res3[0]=theta1[2];Tans->res3[1]=theta2[2];Tans->res3[2]=theta3[2];Tans->res3[3]=theta4[2];Tans->res3[4]=theta5[2];
-	  Tans->res4[0]=theta1[3];Tans->res4[1]=theta2[3];Tans->res4[2]=theta3[3];Tans->res4[3]=theta4[3];Tans->res4[4]=theta5[3];
+	 for(int i = 0;i<4;i++)
+	 {
+		 Tans[i][0] = theta1[i];
+		 Tans[i][1] = theta2[i];
+		 Tans[i][2] = theta3[i];
+		 Tans[i][3] = theta4[i]; 
+		 Tans[i][4] = theta5[i]; 
+	 }
+	 
+	 //=============================解的筛选(处理多解问题)========================================
+   //主要分析机械臂的1/2/3关节角度即可
+	 for(int i =0;i<4;i++)
+	 {
+		if((-2<Tans[i][0]&&Tans[i][0]<2)&&(-1<Tans[i][1]&&Tans[i][1]<1)&&(-1.67<Tans[i][2]&&Tans[i][2]<0.9))
+		{
+		 res[0] = theta1[i];
+		 res[1] = theta2[i];
+		 res[2] = theta3[i];
+		 res[3] = theta4[i]; 
+		 res[4] = theta5[i]; 
+		}
+	 }
+	  
+}
+
+
+//=============输入目标物体位置，获得物体相对于机械臂的变换矩阵================
+void target_T_get(float x,float y,float z,float (*T)[4])
+{
+	T[0][0] = 0;T[0][1] = 1;T[0][2] =  0;T[0][3] = x;
+	T[1][0] = 1;T[1][1] = 0;T[1][2] =  0;T[1][3] = y;
+	T[2][0] = 0;T[2][1] = 0;T[2][2] = -1;T[2][3] = z+63;
+	T[3][0] = 0;T[3][1] = 0;T[3][2] =  0;T[3][3] = 1;
+
 }

@@ -10,18 +10,6 @@ typedef __packed struct
 	float   acc[100];
 	
 }path_message;
-
-//一条路径的数据
-typedef __packed struct
-{
-	//初始时间和最终时间
-	float t_s;
-	float t_f;
-	//每个电机的路径规划数据
-  path_message joint_path[5];
-}path;
-
-
 //一个点而已啦，包含5个关节的角度、速度和加速度数据
 //默认为起始点位置
 typedef __packed struct
@@ -31,7 +19,19 @@ typedef __packed struct
 	float acc[5];
 }point;
 
+//一条路径的数据
+typedef __packed struct
+{
+	//初始时间和最终时间
+	float t_s;
+	float t_f;
+	//每个电机的路径规划数据
+  path_message joint_path[5];
+	point start;
+	point end;
+}path;
 
-void one_path_cala(point *points,point *pointf,path *path);
-void path_planning(point *points,point *pointf,path *path);
+
+
+void path_planning(path *path);
 #endif

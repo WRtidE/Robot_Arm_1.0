@@ -27,22 +27,30 @@ Project File Date:  05/19/2024
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'F:\DownLoad\Keil5\ARM\ARMCC\Bin'
 Build target 'Robotic_Arm'
-compiling IK.c...
-App\IK.c(110): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  		 if(theta3[i]>3.14)
-App\IK.c(152): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  		 if(theta2[i]>3.14)
-App\IK.c(177): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  		 if(theta4[i]>3.14)
-App\IK.c(192): warning:  #1-D: last line of file ends without a newline
-  }
-App\IK.c(54): warning:  #177-D: variable "a2"  was declared but never referenced
-    uint16_t a2 = arm->a[1]; uint16_t a3 = arm->a[2];uint16_t a4 = arm->a[3];
-App\IK.c: 5 warnings, 0 errors
+compiling Kinemat_Task.c...
+./DriverLayer/Uart_user.h(5): warning:  #1295-D: Deprecated declaration data_send - give arg types
+  void data_send();
+./DriverLayer/Uart_user.h(6): warning:  #1295-D: Deprecated declaration data_receive - give arg types
+  void data_receive();
+./DriverLayer/Uart_user.h(9): warning:  #1295-D: Deprecated declaration data_send_IT - give arg types
+  void data_send_IT();
+./DriverLayer/Uart_user.h(10): warning:  #1295-D: Deprecated declaration data_receive_IT - give arg types
+  void data_receive_IT();
+./DriverLayer/Uart_user.h(11): warning:  #1295-D: Deprecated declaration send_packet - give arg types
+  void send_packet();
+./Device/Servos.h(6): warning:  #1295-D: Deprecated declaration servos_init - give arg types
+  void servos_init();
+Task\Kinemat_Task.c(27): warning:  #1295-D: Deprecated declaration arm_init - give arg types
+  void arm_init();
+Task\Kinemat_Task.c(28): warning:  #1295-D: Deprecated declaration planning_regular - give arg types
+  void planning_regular();
+Task\Kinemat_Task.c(91): warning:  #1-D: last line of file ends without a newline
+   
+Task\Kinemat_Task.c: 9 warnings, 0 errors
 linking...
-Program Size: Code=24556 RO-data=1164 RW-data=144 ZI-data=31336  
+Program Size: Code=24356 RO-data=1004 RW-data=144 ZI-data=25232  
 FromELF: creating hex file...
-"Robotic_Arm\Robotic_Arm.axf" - 0 Error(s), 5 Warning(s).
+"Robotic_Arm\Robotic_Arm.axf" - 0 Error(s), 9 Warning(s).
 
 <h2>Software Packages used:</h2>
 
