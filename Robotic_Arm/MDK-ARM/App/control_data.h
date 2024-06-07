@@ -20,6 +20,9 @@ typedef __packed struct
 
  //模式选择
   int16_t mode;	
+ 
+	//功能选择
+	int16_t function;
 		
 } Control_Data;
 

@@ -8,9 +8,9 @@ void data_receive();
 
 
 //串口6通信
-uint8_t data_length  = 23;
-uint8_t rx_buffer_ch05[23];
-uint8_t tx_buffer_ch05[23];
+uint8_t data_length  = 25;
+uint8_t rx_buffer_ch05[25];
+uint8_t tx_buffer_ch05[25];
 
 Control_Data data;
 //测试
@@ -20,8 +20,7 @@ uint8_t flag=0;
 void data_receive_IT()
 {
 	//接受空闲中断
-  
-	__HAL_UART_ENABLE_IT(&huart6, UART_IT_IDLE); 
+  //__HAL_UART_ENABLE_IT(&huart6, UART_IT_IDLE); 
 	
 	HAL_UART_Receive_DMA(&huart6, rx_buffer_ch05,data_length);
   HAL_Delay(1000);
@@ -59,11 +58,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 				 data.tool       = (rx_buffer_ch05[18]<<8)|rx_buffer_ch05[17];
          data.mode       = (rx_buffer_ch05[20]<<8)|rx_buffer_ch05[19];
 				 data.start      = (rx_buffer_ch05[22]<<8)|rx_buffer_ch05[21];
+				 data.function   = (rx_buffer_ch05[24]<<8)|rx_buffer_ch05[23];
 				
-//				 data.p_int[0] = (rx_buffer_ch05[16]<<8)|rx_buffer_ch05[15];
-//				 data.p_int[1] = (rx_buffer_ch05[18]<<8)|rx_buffer_ch05[17];
-//				 data.p_int[2] = (rx_buffer_ch05[20]<<8)|rx_buffer_ch05[19];
-//				 data.p_int[3] = (rx_buffer_ch05[22]<<8)|rx_buffer_ch05[21];
+
 				 
          RxState=2;
 			}

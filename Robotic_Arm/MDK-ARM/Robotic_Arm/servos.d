@@ -35,3 +35,4 @@ robotic_arm\servos.o: Device\Servos.h
 robotic_arm\servos.o: Device\Servos.h
 robotic_arm\servos.o: ../Inc/tim.h
 robotic_arm\servos.o: ../Inc/main.h
+robotic_arm\servos.o: ./App/control_data.h

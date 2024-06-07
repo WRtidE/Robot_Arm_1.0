@@ -12,8 +12,8 @@
 
 
 float theta;
-float vel;
-float acc;
+float vel = 0;
+float acc = 0;
 
 uint16_t num=0;
 //电机初始化
@@ -25,35 +25,22 @@ static void motor_stop_and_keep();
 //模式1
 static void motor_remote_control();
 //模式2
-static void mode_2();
+static void motor_control_kinemat();
 //模式3
 static void mode_3();
 //控制数据处理
 static void data_operate();
 
 
-
-//mit控制模式
-//static void mit_contorl();
- //static void mit_rc_contorl();
-
-//速度位置模式控制
-//static void vp_control();
-
-//速度控制模式
-//static void speed_control(); 
-
-
 	
 float mat[4][4] = {0};
 void arm_task(void const * argument)
 {
-		//motor_init();
-	  //servos_init();
+		motor_init();
+	  servos_init();
 	 
 		for(;;)
 		{		 
-			  
 			 mode_chose();
 			//servos_control(data.z,3);
 			//servos_control(data.x,4);
@@ -102,6 +89,7 @@ static void motor_init()
 	motor_info[3].can_id = 0x04;
 
 
+  //延时等待电机使能
 	motor_commend(motor_info[0],Data_Enable);
 	HAL_Delay(2000);
 	motor_commend(motor_info[1],Data_Enable);
@@ -119,15 +107,15 @@ void mode_chose()
 	{
 			if(data.mode == 1)//模式选择
 					{
-						motor_remote_control();
+						motor_remote_control(); //操作板控制模式
 					}
-					else if(data.mode == 2)
+			else if(data.mode == 2)
 					{
-						motor_remote_control();
+						motor_control_kinemat();//全自动路径规划模式
 					}
-					else if(data.mode == 3)
+			else if(data.mode == 3)
 					{
-						//mode_3();
+						servos_reset();         //重置舵机位置
 					}
 			else
 			{
@@ -143,17 +131,16 @@ void mode_chose()
 //================================模式0 保持静止====================================
 void motor_stop_and_keep()
 { 
-	 for(uint16_t i =0;i<5;i++)
+	 for(uint16_t i =0;i<4;i++)
 	{
 	  motor_info[i].target_angle = motor_info[i].position;
 		motor_info[i].target_speed = 0;
 	}
-	 for(uint16_t i =0;i<5;i++)
+	 for(uint16_t i =0;i<4;i++)
 	{
 		 PosSpeed_CtrlMotor(&hcan1,motor_info[i].can_id, motor_info[i].target_angle, motor_info[i].target_speed);
 		 HAL_Delay(1);
 	}
-	
 }
 //================================模式1 手动控制====================================
 void motor_remote_control()
@@ -166,29 +153,38 @@ void motor_remote_control()
 		  motor_info[i].target_angle = motor_info[i].target_angle + add/12700;
 	}
 	
+	
 	//采用位置速度模式控制电机
 	for(uint16_t i = 0;i<4;i++)
 	{
 		PosSpeed_CtrlMotor(&hcan1,motor_info[i].can_id, motor_info[i].target_angle, motor_info[i].target_speed);
 		HAL_Delay(1);
 	}
+	//控制舵机
+	servos_control(servo_info[0].target_angle,servo_info[1].channel_id);
+	servos_control(servo_info[1].target_angle,servo_info[1].channel_id);
 
 }
 //================================模式3 自动控制====================================
 void motor_control_kinemat()
 { 
-	for(uint16_t i =0;i<5;i++)
+	for(uint16_t i =0;i<4;i++)
 	{
 		 PosSpeed_CtrlMotor(&hcan1,motor_info[i].can_id, motor_info[i].target_angle, motor_info[i].target_speed);
 		 HAL_Delay(1);
 	}
+	servos_control(servo_info[0].target_angle,servo_info[1].channel_id);
+	servos_control(servo_info[1].target_angle,servo_info[1].channel_id);
 }
 
+
+
+//==================================控制模式====================================
 //mit控制模式
 /*
 	对位置进行控制时，kd 不能赋 0，否则会造成电机震荡，甚至失控
 	根据 MIT 模式可以衍生出多种控制模式，如 kp=0,kd 不为 0 时，给定 v_des
-	即可实现匀速转动;kp=0,kd=0，给定 t_ff 即可实现给定扭矩输出
+	即可实现匀速转动;kp=0,kd=0，给定 t_ff 即可实现给定mt扭矩输出
 */
 void mit_contorl()
 {
@@ -206,3 +202,17 @@ void vp_control()
 {
 	PosSpeed_CtrlMotor(&hcan1,motor_info[0].can_id, motor_info[0].target_angle, motor_info[0].target_speed);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
