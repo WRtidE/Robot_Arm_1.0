@@ -67,12 +67,6 @@ void path_planning(path *path)
 	 //算完后再执行路径规划
 	for(int index =0;index<100;index++)
 	{
-		for(uint16_t id = 0;id<5;id++)
-		{
-			motor_info[id].target_angle = path->joint_path[id].theta[index];
-			motor_info[id].target_speed = path->joint_path[id].vel[index];
-			motor_info[id].target_T_ff  = path->joint_path[id].acc[index];
-		}
 		//对角度值进行处理，将电机角度与MATLAB仿真中的角度一一对应
 		//将目标角度值赋给电机		
 		motor_info[0].target_angle =  path->joint_path[0].theta[index];

@@ -26,20 +26,51 @@ L(5)=Link([ 0   d5   a5   alpha5], 'modified');
 
 robot=SerialLink(L,'name','robot');
 robot.teach()
+robot.display();
+
+plot_sphere([100,100,100],50)
+
 
 %% FK.m 正解函数测试
-q1 = [0,0,0,pi/2,0];
+q1 = [0,-1.7,1,0.9,0];
 %q1 =  [90,-7,0,-50,-7]*pi/180;
 T1 = robot.fkine(q1)
 T2 = FK(q1,a,d,alpha,l)
 
+robot.plot(q1)
 %% IK., 逆解函数测试
 theta = IK(T2,a,d,l)
 robot.plot(theta(1,:));
 pause;
+%% 机械臂工作空间可视化
+% 关节角度限制
+L(1).qlim = [-2,2];
+L(2).qlim = [-1,1];
+L(3).qlim = [-1.67,0.9];
+L(4).qlim = [-90,90]/180 * pi;
+L(5).qlim = [-180,180]/180 * pi;
 
+num = 20000;
+for i = 1:num
+
+    q1 = L(1).qlim(1) + rand*(L(1).qlim(2) - L(1).qlim(1));
+    q2 = L(2).qlim(1) + rand*(L(2).qlim(2) - L(2).qlim(1));
+    q3 = L(3).qlim(1) + rand*(L(3).qlim(2) - L(3).qlim(1));
+    q4 = L(4).qlim(1) + rand*(L(4).qlim(2) - L(4).qlim(1));
+    q5 = L(5).qlim(1) + rand*(L(5).qlim(2) - L(5).qlim(1));
+    
+    q = [q1 q2 q3 q4 q5];
+    T = robot.fkine(q);
+    %Five_dof.plot(q);
+    P(i,:) = transl(T);  
+end
+
+plot3(P(:,1),P(:,2),P(:,3),'b.','MarkerSize',1);
+
+robot.display();  %查看DH表
+robot.teach       %查看GUI
 %% target_calc.m 函数测试，输入xyz的值，让机械臂执行器达到指定位置
-Txyz = target_calc(155,269,0);
+Txyz = target_calc(155,269,10);
 theta = IK(Txyz,a,d,l)
 robot.plot(theta(1,:))
 pause;
@@ -47,7 +78,19 @@ Txyz = target_calc(-155,-269,20);
 theta = IK(Txyz,a,d,l)
 robot.plot(theta(1,:))
 pause;
+% 判断是否越界,从四组解中找到一组最适合的解，主要分析关节1/2/3即可
+for i = 1:4
+ theta(i,1)
+ if((-2<theta(i,1))&&(theta(i,1)<2) ...
+  && (-1< theta(i,2))&& ( theta(i,2)< 1) ...
+  && (-1.67<theta(i,3))&&(theta(i,3)<0.9))
 
+  robot.plot(theta(i,:))
+  theta_final = theta(i,:)% 目标位置的四个转角
+
+ end
+ pause;
+end
 
 %% path_calc 函数测试,输入目标角度和当前角度等信息，获得轨迹规划
 theta_start = [0 0 0 0 0];
@@ -89,7 +132,6 @@ theta = IK(Tbox_robo,a,d,l)
 
 % 判断是否越界,从四组解中找到一组最适合的解，主要分析关节1/2/3即可
 for i = 1:4
- i
  theta(i,1)
  if((-2<theta(i,1))&&(theta(i,1)<2) ...
   && (-1< theta(i,2))&& ( theta(i,2)< 1) ...
@@ -101,7 +143,7 @@ for i = 1:4
  end
  pause;
 end
-
+%%
 %轨迹规划
 theta_start= [0 0 0 0 0];
 v_s = [0 0 0 0 0];

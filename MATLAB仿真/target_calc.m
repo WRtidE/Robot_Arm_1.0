@@ -6,6 +6,5 @@ function T_target = target_calc(x,y,z)
  %执行器相对于机械臂末端的矩阵
  T_tool      = [0 1 0 0; 1 0 0 0; 0 0 -1 z+63; 0 0 0 1];
 
-  
  T_target = T_objection * T_tool;
 end
