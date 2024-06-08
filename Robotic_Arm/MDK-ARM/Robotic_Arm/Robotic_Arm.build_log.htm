@@ -22,12 +22,12 @@ Dialog DLL:      TCM.DLL V1.32.0.0
  
 <h2>Project:</h2>
 D:\Robotic_Arm\MDK-ARM\Robotic_Arm.uvprojx
-Project File Date:  05/19/2024
+Project File Date:  06/08/2024
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'F:\DownLoad\Keil5\ARM\ARMCC\Bin'
 Build target 'Robotic_Arm'
-compiling Kinemat_Task.c...
+compiling Arm_Task.c...
 ./DriverLayer/Uart_user.h(5): warning:  #1295-D: Deprecated declaration data_send - give arg types
   void data_send();
 ./DriverLayer/Uart_user.h(6): warning:  #1295-D: Deprecated declaration data_receive - give arg types
@@ -42,27 +42,37 @@ compiling Kinemat_Task.c...
   void servos_init();
 ./Device/Servos.h(8): warning:  #1295-D: Deprecated declaration servos_reset - give arg types
   void servos_reset();
-Task\Kinemat_Task.c(31): warning:  #1295-D: Deprecated declaration arm_init - give arg types
-  static void arm_init();
-Task\Kinemat_Task.c(34): warning:  #1295-D: Deprecated declaration mode_choice - give arg types
-  static void mode_choice();
-Task\Kinemat_Task.c(35): warning:  #1295-D: Deprecated declaration catch_the_object - give arg types
-  static void catch_the_object();
-Task\Kinemat_Task.c(36): warning:  #1295-D: Deprecated declaration back_to_exit - give arg types
-  static void back_to_exit();
-Task\Kinemat_Task.c(37): warning:  #1295-D: Deprecated declaration back_to_inital - give arg types
-  static void back_to_inital();
-Task\Kinemat_Task.c(221): warning:  #1-D: last line of file ends without a newline
-   
-Task\Kinemat_Task.c(29): warning:  #177-D: variable "pi"  was declared but never referenced
-  static float pi=3.1415;
-Task\Kinemat_Task.c(192): warning:  #177-D: function "back_to_exit"  was declared but never referenced
-  void back_to_exit()
-Task\Kinemat_Task.c: 15 warnings, 0 errors
+Task\Arm_Task.c(20): warning:  #1295-D: Deprecated declaration motor_init - give arg types
+  static void motor_init();
+Task\Arm_Task.c(22): warning:  #1295-D: Deprecated declaration mode_chose - give arg types
+  static void mode_chose();
+Task\Arm_Task.c(24): warning:  #1295-D: Deprecated declaration motor_stop_and_keep - give arg types
+  static void motor_stop_and_keep();
+Task\Arm_Task.c(26): warning:  #1295-D: Deprecated declaration motor_remote_control - give arg types
+  static void motor_remote_control();
+Task\Arm_Task.c(28): warning:  #1295-D: Deprecated declaration motor_control_kinemat - give arg types
+  static void motor_control_kinemat();
+Task\Arm_Task.c(30): warning:  #1295-D: Deprecated declaration mode_3 - give arg types
+  static void mode_3();
+Task\Arm_Task.c(32): warning:  #1295-D: Deprecated declaration data_operate - give arg types
+  static void data_operate();
+Task\Arm_Task.c(34): warning:  #1295-D: Deprecated declaration motor_control_send - give arg types
+  static void motor_control_send();
+Task\Arm_Task.c(51): warning:  #111-D: statement is unreachable
+  		osDelay(1);
+Task\Arm_Task.c(160): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  		if(motor_info[i].target_angle > 3.0 )
+Task\Arm_Task.c(99): warning:  #177-D: function "mode_chose"  was declared but never referenced
+  void mode_chose()
+Task\Arm_Task.c(30): warning:  #177-D: function "mode_3"  was declared but never referenced
+  static void mode_3();
+Task\Arm_Task.c(32): warning:  #177-D: function "data_operate"  was declared but never referenced
+  static void data_operate();
+Task\Arm_Task.c: 20 warnings, 0 errors
 linking...
-Program Size: Code=26548 RO-data=1004 RW-data=180 ZI-data=25332  
+Program Size: Code=15828 RO-data=632 RW-data=152 ZI-data=19136  
 FromELF: creating hex file...
-"Robotic_Arm\Robotic_Arm.axf" - 0 Error(s), 15 Warning(s).
+"Robotic_Arm\Robotic_Arm.axf" - 0 Error(s), 20 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -86,7 +96,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.6.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:03
 </pre>
 </body>
 </html>

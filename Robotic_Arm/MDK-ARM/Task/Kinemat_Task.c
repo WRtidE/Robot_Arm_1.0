@@ -76,7 +76,7 @@ void mode_choice()
 	{
     if(data.function == 1)
 		{
-			catch_the_object();
+			//catch_the_object();
 		}
 		else if(data.function == 2)
 		{

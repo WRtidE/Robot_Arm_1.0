@@ -30,6 +30,8 @@ static void motor_control_kinemat();
 static void mode_3();
 //控制数据处理
 static void data_operate();
+//控制电机
+static void motor_control_send();
 
 
 	
@@ -41,18 +43,9 @@ void arm_task(void const * argument)
 	 
 		for(;;)
 		{		 
-			 mode_chose();
-			//servos_control(data.z,3);
-			//servos_control(data.x,4);
-//			data_operate();
-//		  Speed_CtrlMotor(&motor_info[0].hcan, motor_info[0].can_id, motor_info[0].target_speed);
-//    	HAL_Delay(1);
-//      Speed_CtrlMotor(&motor_info[1].hcan, motor_info[1].can_id, motor_info[1].target_speed);
-//      HAL_Delay(1);
-//      Speed_CtrlMotor(&motor_info[2].hcan, 0x03, motor_info[2].target_speed);
-//      HAL_Delay(1);
-//      Speed_CtrlMotor(&motor_info[3].hcan, 0x04, motor_info[3].target_speed);
-//      HAL_Delay(1);
+			 //mode_chose();
+			motor_remote_control();
+			motor_control_send();
       osDelay(1);
 		}
 		osDelay(1);
@@ -63,6 +56,7 @@ void arm_task(void const * argument)
 //电机初始化
 static void motor_init()
 {
+	
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);       //开启舵机电源
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0,  GPIO_PIN_RESET);     //点个灯
 	
@@ -77,10 +71,10 @@ static void motor_init()
 	motor_info[3].hcan =  hcan1;
 	
 	//电机模式设置:为0为IMT模式，为1为位置速度模式，为2为速度模式
-	motor_info[0].mode = 2;  
-	motor_info[1].mode = 2; 
-	motor_info[2].mode = 2; 
-	motor_info[3].mode = 2; 
+	motor_info[0].mode = 1;  
+	motor_info[1].mode = 1; 
+	motor_info[2].mode = 1; 
+	motor_info[3].mode = 1; 
 	
 	//设置电机id
 	motor_info[0].can_id = 0x01; 
@@ -98,8 +92,9 @@ static void motor_init()
 	HAL_Delay(2000);
 	motor_commend(motor_info[3],Data_Enable);
 	HAL_Delay(2000);
-
+	
 }
+
 //================================模式选择==========================================
 void mode_chose()
 {
@@ -138,31 +133,51 @@ void motor_stop_and_keep()
 	}
 	 for(uint16_t i =0;i<4;i++)
 	{
-		 PosSpeed_CtrlMotor(&hcan1,motor_info[i].can_id, motor_info[i].target_angle, motor_info[i].target_speed);
+		 PosSpeed_CtrlMotor(&motor_info[i].hcan,motor_info[i].can_id, motor_info[i].target_angle, motor_info[i].target_speed);
 		 HAL_Delay(1);
 	}
 }
 //================================模式1 手动控制====================================
 void motor_remote_control()
 {
-
-	//对收到的数据进行处理
+   
+	//数据进行处理
 	for(uint8_t i = 0;i<4;i++)
 	{
-		  float add = data.channel[i];
+		//通道值处理
+		if(data.channel[i]>40)
+		{
+			float add = data.channel[i]-40;
 		  motor_info[i].target_angle = motor_info[i].target_angle + add/12700;
+		}
+		else if(data.channel[i]<-40)
+		{
+			float add = data.channel[i]+40;
+		  motor_info[i].target_angle = motor_info[i].target_angle + add/12700;
+		}
+		
+		//角度越界处理
+		if(motor_info[i].target_angle > 3.0 )
+		{
+			motor_info[i].target_angle = 3.0;
+		}
+		else if(motor_info[i].target_angle < -3.0)
+		{
+			motor_info[i].target_angle = -3.0;
+		}
+		else
+		{
+		}
 	}
 	
+	servo_info[0].target_angle = data.channel[4];
+	servo_info[1].target_angle = 500 + data.tool * 1000;
 	
-	//采用位置速度模式控制电机
-	for(uint16_t i = 0;i<4;i++)
+	for(uint16_t i=0;i<4;i++)
 	{
-		PosSpeed_CtrlMotor(&hcan1,motor_info[i].can_id, motor_info[i].target_angle, motor_info[i].target_speed);
-		HAL_Delay(1);
+		motor_info[i].target_speed = 5;
 	}
-	//控制舵机
-	servos_control(servo_info[0].target_angle,servo_info[1].channel_id);
-	servos_control(servo_info[1].target_angle,servo_info[1].channel_id);
+	
 
 }
 //================================模式3 自动控制====================================
@@ -173,11 +188,25 @@ void motor_control_kinemat()
 		 PosSpeed_CtrlMotor(&hcan1,motor_info[i].can_id, motor_info[i].target_angle, motor_info[i].target_speed);
 		 HAL_Delay(1);
 	}
-	servos_control(servo_info[0].target_angle,servo_info[1].channel_id);
+	servos_control(servo_info[0].target_angle,servo_info[0].channel_id);
 	servos_control(servo_info[1].target_angle,servo_info[1].channel_id);
 }
 
-
+//==================================电机控制信息发送====================================
+void motor_control_send()
+{
+		PosSpeed_CtrlMotor(&motor_info[0].hcan,motor_info[0].can_id, motor_info[0].target_angle, motor_info[0].target_speed);
+		HAL_Delay(1);
+		PosSpeed_CtrlMotor(&motor_info[1].hcan,motor_info[1].can_id, motor_info[1].target_angle, motor_info[1].target_speed);
+		HAL_Delay(1);
+		PosSpeed_CtrlMotor(&motor_info[2].hcan,motor_info[2].can_id, motor_info[2].target_angle, motor_info[2].target_speed);
+		HAL_Delay(1);
+		PosSpeed_CtrlMotor(&motor_info[3].hcan,motor_info[3].can_id, motor_info[3].target_angle, motor_info[3].target_speed);
+		HAL_Delay(1);
+	
+		servos_control(servo_info[0].target_angle,servo_info[0].channel_id);
+	  servos_control(servo_info[1].target_angle,servo_info[1].channel_id);
+}
 
 //==================================控制模式====================================
 //mit控制模式
@@ -195,7 +224,6 @@ void mit_contorl()
 														 motor_info[1].Kd, 
 														 motor_info[1].target_T_ff);
 }
-
 
 //速度位置模式控制
 void vp_control()

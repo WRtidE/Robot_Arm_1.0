@@ -5,12 +5,12 @@ CANx_t CAN_1,CAN_2;
 char Selection=0;
 //have a test;
 uint8_t test=0;
-
+float start_flag[4] = {0,0,0,0};
 /**
 * @brief  这里对ID为0x02、0x03、0x04的3个电机进行依次控制，在freertos.c中CAN_Send_Task任务中1ms执行一次，
 这里使用了3个电机也就是每个电机3ms发送一次,注意多个电机不能同时一起发，发送频率过快，则会使有些ID没发送到
  * @param  void     	
- * @param  vodi      
+ * @param  void    
  * @param  void    	
  * @param  void      	
  */
@@ -261,8 +261,15 @@ void Speed_CtrlMotor(CAN_HandleTypeDef* hcan, uint16_t ID, float _vel)
 						  motor_info[1].can_id   = CAN_1.RxData[0];
 							motor_info[1].position = CAN_1.position[1];
 							motor_info[1].torque   = CAN_1.velocity[1];
-							motor_info[1].velocity = CAN_1.torque[1];						
+							motor_info[1].velocity = CAN_1.torque[1];		
+						
+							if(start_flag[1] == 0)
+							{
+								motor_info[1].target_angle = motor_info[1].position;
+								start_flag[1] = 1;
+							}						
 					} 
+
 				 if(CAN_1.RxData[0] == 0X13)
 				 {
 							CAN_1.p_int[2]=(CAN_1.RxData[1]<<8)|CAN_1.RxData[2];
@@ -272,10 +279,16 @@ void Speed_CtrlMotor(CAN_HandleTypeDef* hcan, uint16_t ID, float _vel)
 							CAN_1.velocity[2] = uint_to_float(CAN_1.v_int[2], V_MIN, V_MAX, 12); // (-45.0,45.0)  速度
 							CAN_1.torque[2] = uint_to_float(CAN_1.t_int[2], T_MIN, T_MAX, 12); // (-18.0,18.0)    转矩
                
-						  motor_info[2].can_id   = CAN_1.RxData[0];
+						  motor_info[2].can_id   = CAN_1.RxData[0] - 0x10;
 							motor_info[2].position = CAN_1.position[2];
 							motor_info[2].torque   = CAN_1.velocity[2];
-							motor_info[2].velocity = CAN_1.torque[2];						
+							motor_info[2].velocity = CAN_1.torque[2];	
+					 
+							if(start_flag[2] == 0)
+							{
+								motor_info[2].target_angle = motor_info[2].position;
+								start_flag[2] = 1;
+							}							 
 					} 
 				 if(CAN_1.RxData[0] == 0X14)
 				 {
@@ -286,10 +299,16 @@ void Speed_CtrlMotor(CAN_HandleTypeDef* hcan, uint16_t ID, float _vel)
 							CAN_1.velocity[3] = uint_to_float(CAN_1.v_int[3], V_MIN, V_MAX, 12); // (-45.0,45.0)  速度
 							CAN_1.torque[3] = uint_to_float(CAN_1.t_int[3], T_MIN, T_MAX, 12); // (-18.0,18.0)    转矩
                
-						  motor_info[3].can_id   = CAN_1.RxData[0];
+						  motor_info[3].can_id   = CAN_1.RxData[0] - 0x10;
 							motor_info[3].position = CAN_1.position[3];
 							motor_info[3].torque   = CAN_1.velocity[3];
-							motor_info[3].velocity = CAN_1.torque[3];						
+							motor_info[3].velocity = CAN_1.torque[3];		
+
+							if(start_flag[3] == 0)
+							{
+								motor_info[3].target_angle = motor_info[3].position;
+								start_flag[3] = 1;
+							}								 
 					} 
 
 	        HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO0_MSG_PENDING);	//激活CAN中断通知					
@@ -314,6 +333,12 @@ void Speed_CtrlMotor(CAN_HandleTypeDef* hcan, uint16_t ID, float _vel)
 							motor_info[0].position = CAN_2.position[0];
 							motor_info[0].torque   = CAN_2.velocity[0];
 							motor_info[0].velocity = CAN_2.torque[0];
+						
+							if(start_flag[0] == 0)
+							{
+								motor_info[0].target_angle = motor_info[0].position;
+								start_flag[0] = 1;
+							}			
 					} 
 					
 				  HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO0_MSG_PENDING); //激活CAN中断通知

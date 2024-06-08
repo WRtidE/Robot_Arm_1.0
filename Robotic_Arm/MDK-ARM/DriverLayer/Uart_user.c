@@ -20,7 +20,7 @@ uint8_t flag=0;
 void data_receive_IT()
 {
 	//接受空闲中断
-  //__HAL_UART_ENABLE_IT(&huart6, UART_IT_IDLE); 
+  __HAL_UART_ENABLE_IT(&huart6, UART_IT_IDLE); 
 	
 	HAL_UART_Receive_DMA(&huart6, rx_buffer_ch05,data_length);
   HAL_Delay(1000);
@@ -59,9 +59,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
          data.mode       = (rx_buffer_ch05[20]<<8)|rx_buffer_ch05[19];
 				 data.start      = (rx_buffer_ch05[22]<<8)|rx_buffer_ch05[21];
 				 data.function   = (rx_buffer_ch05[24]<<8)|rx_buffer_ch05[23];
-				
-
-				 
+						 
          RxState=2;
 			}
       if(RxState==2)
@@ -70,10 +68,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
          { 
 				   RxState=0;
 				 }
-				 HAL_UART_Receive_DMA(&huart6,rx_buffer_ch05,data_length);
+				 //HAL_UART_Receive_DMA(&huart6,rx_buffer_ch05,data_length);
 			}
 		  
 	}	
+	HAL_UART_Receive_DMA(&huart6,rx_buffer_ch05,data_length);
 }
 
 //中断发送方式

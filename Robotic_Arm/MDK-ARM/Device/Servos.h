@@ -3,7 +3,7 @@
 #include "Servos.h"
 
 //º¯ÊıÉùÃ÷
-void servos_control(uint16_t angle,uint16_t id);
+void servos_control(float angle,uint16_t id);
 void servos_init();
 void servos_reset();
 	
