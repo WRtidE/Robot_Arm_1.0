@@ -10,13 +10,13 @@ servo_info_t servo_info[3];
 void servos_init();
 void servos_control(float angle,uint16_t id);
 
-float flagggg  = 0;
-float flaggggg = 0;
 //=================舵机初始化=================
 void servos_init()
 {
   servo_info[0].channel_id = 3;
 	servo_info[1].channel_id = 4;
+	
+	servo_info[0].position = 0;
 	
 	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
 	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_4);
@@ -36,7 +36,8 @@ void servos_reset()
 	servos_control(servo_info[1].target_angle,servo_info[1].channel_id);
 }
 
-//关节5     1326 中位置0     700 左90   2030 右90  
+//关节5     1315 中位置0     1940 顺时针90   690 逆时针90 
+//1940 -1315 = 625 ； 1315 - 690 = 625 
 //夹爪      1500 夹取        500松开
 
 //=================舵机控制=================
@@ -48,15 +49,13 @@ id为6的舵机控制机械臂夹爪。
 
 void servos_control(float angle,uint16_t id)
 {
-	if(angle<0)
-	{
-		angle=-angle;
-	}
 
 	switch(id)
 	{
 		case 3://控制机械臂第5个关节
 		{
+			//将弧度值换算为舵机的控制频率
+			angle = angle * 398.1 + 1315;
 		__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, angle);
 	   break;
 		}

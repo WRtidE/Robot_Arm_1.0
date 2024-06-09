@@ -2,7 +2,6 @@
 #include "IK.h"
 #include <math.h>
 
-float t[100];
 static float pi = 3.1416;
 manipulator arm;
 

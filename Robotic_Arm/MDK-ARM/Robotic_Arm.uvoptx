@@ -238,6 +238,16 @@
           <WinNumber>1</WinNumber>
           <ItemText>angle</ItemText>
         </Ww>
+        <Ww>
+          <count>18</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\Robotic_Arm\DriverLayer/Can_user.c\motor_info[0]</ItemText>
+        </Ww>
+        <Ww>
+          <count>19</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>finish_flag</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

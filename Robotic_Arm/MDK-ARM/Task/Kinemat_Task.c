@@ -12,10 +12,10 @@
 
 //================================变量定义================================
 //储存几个重要pos
-float inital_pos[5] = {0,0,0,2,0}; //初始位置
-float   exit_pos[5] = {0,-1.7,1,0.9,0};  //安全掉电位置
+float inital_pos[5] = {0,0,0,1.5708,0}; //初始位置
+float   exit_pos[5] = {0,-1.8,1.22,0.73,0};  //安全掉电位置
 
-
+float finish_flag = 1;
 float martx[4][4];
 float T_target[4][4];
 float T_res[5];
@@ -46,8 +46,30 @@ void kinemat_task(void const * argument)
 
 	for(;;)
 		{		 
-	  state_check =0;
-		mode_choice();
+			if(data.start == 1)
+			{
+				if(data.mode == 1 && finish_flag == 0)
+				{
+					back_to_exit();
+					finish_flag = 1;
+				}
+				else if(data.mode == 2 && finish_flag == 0)
+				{
+					path_plan(-200,200,10,0,3);
+					finish_flag = 1;
+				}
+				else if(data.mode == 0 && finish_flag == 0)
+				{
+					back_to_inital();
+					finish_flag = 1;
+				}			
+			}	
+			else
+			{
+				finish_flag = 0;
+			}
+//	  state_check =0;
+//		mode_choice();
 		osDelay(1);
 	 }
 
@@ -76,6 +98,7 @@ void mode_choice()
 	{
     if(data.function == 1)
 		{
+			
 			//catch_the_object();
 		}
 		else if(data.function == 2)
@@ -134,25 +157,18 @@ void path_plan(float x,float y,float z,float time_start,float time_final)
 	target_T_get(x,y,z,T_target);
   IK_calc(T_target,T_res);
 	
-	for(uint16_t i =0;i<5;i++)
+	for(uint16_t i =0;i<4;i++)
 	{
 	  first_path.end.theta[i] = T_res[i];
 	}
-	
+	servo_info[0].target_angle = T_res[4];
 	//当前角度值
-//	first_path.start.theta[0] = motor_info[0].position;
-//	first_path.start.theta[1] = motor_info[1].position;
-//	first_path.start.theta[2] = motor_info[2].position;
-//	first_path.start.theta[3] = motor_info[3].position - pi/2;
-//	first_path.start.theta[4] = servo_info[0].position;
-	
-	first_path.start.theta[0] = first_path.joint_path[0].theta[99];
-	first_path.start.theta[1] = first_path.joint_path[1].theta[99];
-	first_path.start.theta[2] = first_path.joint_path[2].theta[99];
-	first_path.start.theta[3] = first_path.joint_path[3].theta[99];
-	first_path.start.theta[4] = first_path.joint_path[4].theta[99];
-	
-	
+	first_path.start.theta[0] = motor_info[0].position;
+	first_path.start.theta[1] = -motor_info[1].position;
+	first_path.start.theta[2] = motor_info[2].position;
+	first_path.start.theta[3] = -motor_info[3].position;
+
+		
 	//生成轨迹并且开始执行控制
 	path_planning(&first_path);
 }
@@ -163,26 +179,20 @@ void back_to_inital()
 {
 	//设置启动时间
 	first_path.t_s = 0;
-	first_path.t_f = 10;
+	first_path.t_f = 3;
 	
 	//获得目标角度	
 	for(uint16_t i =0;i<5;i++)
 	{
 	  first_path.end.theta[i] = inital_pos[i];
 	}
-	
+	servo_info[0].target_angle =inital_pos[4];
 	//当前角度
-//	first_path.start.theta[0] = motor_info[0].position;
-//	first_path.start.theta[1] = motor_info[1].position;
-//	first_path.start.theta[2] = motor_info[2].position;
-//	first_path.start.theta[3] = motor_info[3].position - pi/2;
-//	first_path.start.theta[4] = servo_info[0].position;
-	
-	first_path.start.theta[0] = first_path.joint_path[0].theta[99];
-	first_path.start.theta[1] = first_path.joint_path[1].theta[99];
-	first_path.start.theta[2] = first_path.joint_path[2].theta[99];
-	first_path.start.theta[3] = first_path.joint_path[3].theta[99];
-	first_path.start.theta[4] = first_path.joint_path[4].theta[99];
+	first_path.start.theta[0] = motor_info[0].position;
+	first_path.start.theta[1] = -motor_info[1].position;
+	first_path.start.theta[2] = motor_info[2].position;
+	first_path.start.theta[3] = -motor_info[3].position;
+
 	
 	//生成轨迹并且开始执行控制
 	path_planning(&first_path);
@@ -193,28 +203,24 @@ void back_to_exit()
 {
 	//设置启动时间
 	first_path.t_s = 0;
-	first_path.t_f = 10;
+	first_path.t_f = 5;
 	
 	//获得目标角度	
 	for(uint16_t i =0;i<5;i++)
 	{
 	  first_path.end.theta[i] = exit_pos[i];
 	}
-	
+	servo_info[0].target_angle = 0;
 	//当前角度
-//	first_path.start.theta[0] = motor_info[0].position;
-//	first_path.start.theta[1] = motor_info[1].position;
-//	first_path.start.theta[2] = motor_info[2].position;
-//	first_path.start.theta[3] = motor_info[3].position - pi/2;
-//	first_path.start.theta[4] = servo_info[0].position;
-	first_path.start.theta[0] = first_path.joint_path[0].theta[99];
-	first_path.start.theta[1] = first_path.joint_path[1].theta[99];
-	first_path.start.theta[2] = first_path.joint_path[2].theta[99];
-	first_path.start.theta[3] = first_path.joint_path[3].theta[99];
-	first_path.start.theta[4] = first_path.joint_path[4].theta[99];
+	first_path.start.theta[0] = motor_info[0].position;
+	first_path.start.theta[1] = -motor_info[1].position;
+	first_path.start.theta[2] = motor_info[2].position;
+	first_path.start.theta[3] = -motor_info[3].position;
 	
 	//生成轨迹并且开始执行控制
 	path_planning(&first_path);
+	
+	
 }
 
 

@@ -47,3 +47,5 @@ robotic_arm\path_planning.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/
 robotic_arm\path_planning.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h
 robotic_arm\path_planning.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h
 robotic_arm\path_planning.o: ./DriverLayer/Can_user.h
+robotic_arm\path_planning.o: ./Device/Servos.h
+robotic_arm\path_planning.o: ./Device/Servos.h

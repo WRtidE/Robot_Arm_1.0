@@ -2,12 +2,20 @@
 #include "path_planning.h"
 #include "cmsis_os.h"
 #include "Can_user.h"
+#include "Servos.h"
+
 static float pi=3.1415;
+float delay_time = 0;
+float res = 1;
+float ts=0;
+float tf=0;
+float a0,a1,a2,a3,a4,a5 = 0;
+float q0,qf,dq0,dqf,ddq0,ddqf = 0; 
 //===============================计算N次方==============================================================
 //計算n次方
 float power(float num,uint16_t n)
 {
-	float res = 1;
+	res = 1;
 	for(uint16_t i =0;i<n;i++)
 	{
 		res = res * num;
@@ -21,20 +29,19 @@ float power(float num,uint16_t n)
 //需要传入两个点的角度信息，这条轨迹的时间信息，共三个数据
 void one_path_cala(path *path)
 {
-  float ts   = path->t_s;
-	float tf   = path->t_f;
+  ts   = path->t_s;
+	tf   = path->t_f;
 	
-	for(uint16_t i = 0;i<5;i++)
+	for(uint16_t i = 0;i<4;i++)
 	{
-		float q0   = path->start.theta[i];
-		float qf   = path->end.theta[i];
-		float dq0  = path->start.vel[i];
-		float dqf  = path->end.vel[i];
-		float ddq0 = path->start.acc[i];
-		float ddqf = path->end.acc[i];
+		q0   = path->start.theta[i];
+		qf   = path->end.theta[i];
+		dq0  = path->start.vel[i];
+		dqf  = path->end.vel[i];
+		ddq0 = path->start.acc[i];
+		ddqf = path->end.acc[i];
 
-		//计算轨迹五次多项式系数值
-		float a0,a1,a2,a3,a4,a5 = 0;
+		//计算轨迹五次多项式系数值	
 		a0 = q0;
 		a1 = dq0;
 		a2 = ddq0/2;
@@ -72,10 +79,8 @@ void path_planning(path *path)
 		motor_info[0].target_angle =  path->joint_path[0].theta[index];
 		motor_info[1].target_angle = -path->joint_path[1].theta[index];
 		motor_info[2].target_angle =  path->joint_path[2].theta[index];
-		motor_info[3].target_angle = -path->joint_path[3].theta[index]+pi/2;
-		motor_info[4].target_angle =  path->joint_path[4].theta[index];
-		
-		float delay_time = (path->t_f - path->t_s)*10;
+		motor_info[3].target_angle = -path->joint_path[3].theta[index];	
+		delay_time = (path->t_f - path->t_s)*10;
 		osDelay(delay_time);
 	}
  }

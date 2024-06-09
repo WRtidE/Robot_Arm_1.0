@@ -14,6 +14,7 @@
 float theta;
 float vel = 0;
 float acc = 0;
+float add = 0;
 
 uint16_t num=0;
 //电机初始化
@@ -34,8 +35,6 @@ static void data_operate();
 static void motor_control_send();
 
 
-	
-float mat[4][4] = {0};
 void arm_task(void const * argument)
 {
 		motor_init();
@@ -44,7 +43,7 @@ void arm_task(void const * argument)
 		for(;;)
 		{		 
 			 //mode_chose();
-			motor_remote_control();
+			//motor_remote_control();
 			motor_control_send();
       osDelay(1);
 		}
@@ -147,13 +146,17 @@ void motor_remote_control()
 		//通道值处理
 		if(data.channel[i]>40)
 		{
-			float add = data.channel[i]-40;
+			add = data.channel[i]-40;
 		  motor_info[i].target_angle = motor_info[i].target_angle + add/12700;
 		}
 		else if(data.channel[i]<-40)
 		{
-			float add = data.channel[i]+40;
+			add = data.channel[i]+40;
 		  motor_info[i].target_angle = motor_info[i].target_angle + add/12700;
+		}
+		else
+		{
+			 motor_info[i].target_angle = motor_info[i].position;
 		}
 		
 		//角度越界处理
@@ -170,7 +173,8 @@ void motor_remote_control()
 		}
 	}
 	
-	servo_info[0].target_angle = data.channel[4];
+	float angle = data.channel[4];
+	servo_info[0].target_angle = angle/100;
 	servo_info[1].target_angle = 500 + data.tool * 1000;
 	
 	for(uint16_t i=0;i<4;i++)
@@ -195,6 +199,17 @@ void motor_control_kinemat()
 //==================================电机控制信息发送====================================
 void motor_control_send()
 {
+	  //控制数据处理，防止越界
+    if(motor_info[3].target_angle > 0.1)
+		{
+			motor_info[3].target_angle = motor_info[3].position;
+		}
+		for(uint16_t i=0;i<4;i++)
+	  {
+		motor_info[i].target_speed = 1;
+	  }
+		servo_info[1].target_angle = 500 + data.tool * 1000;
+		
 		PosSpeed_CtrlMotor(&motor_info[0].hcan,motor_info[0].can_id, motor_info[0].target_angle, motor_info[0].target_speed);
 		HAL_Delay(1);
 		PosSpeed_CtrlMotor(&motor_info[1].hcan,motor_info[1].can_id, motor_info[1].target_angle, motor_info[1].target_speed);
@@ -205,33 +220,9 @@ void motor_control_send()
 		HAL_Delay(1);
 	
 		servos_control(servo_info[0].target_angle,servo_info[0].channel_id);
+		HAL_Delay(1);
 	  servos_control(servo_info[1].target_angle,servo_info[1].channel_id);
 }
-
-//==================================控制模式====================================
-//mit控制模式
-/*
-	对位置进行控制时，kd 不能赋 0，否则会造成电机震荡，甚至失控
-	根据 MIT 模式可以衍生出多种控制模式，如 kp=0,kd 不为 0 时，给定 v_des
-	即可实现匀速转动;kp=0,kd=0，给定 t_ff 即可实现给定mt扭矩输出
-*/
-void mit_contorl()
-{
-
-	MIT_CtrlMotor(&hcan1,0x02, motor_info[1].target_angle,
-														 motor_info[1].target_speed,
-														 motor_info[1].Kp,
-														 motor_info[1].Kd, 
-														 motor_info[1].target_T_ff);
-}
-
-//速度位置模式控制
-void vp_control()
-{
-	PosSpeed_CtrlMotor(&hcan1,motor_info[0].can_id, motor_info[0].target_angle, motor_info[0].target_speed);
-}
-
-
 
 
 
