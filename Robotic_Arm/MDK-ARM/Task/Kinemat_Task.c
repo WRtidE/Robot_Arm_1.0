@@ -21,6 +21,8 @@ float T_target[4][4];
 float T_res[5];
 float T_test[5];
 
+//x,y,z
+float x,y,z = 0;
 //创建几条轨迹，用来储存轨迹信息
 path first_path;
 path second_path;
@@ -62,7 +64,12 @@ void kinemat_task(void const * argument)
 				{
 					back_to_inital();
 					finish_flag = 1;
-				}			
+				}
+				else if(data.mode == 3 && finish_flag == 0)
+				{
+					catch_the_object();
+					finish_flag = 1;
+				}
 			}	
 			else
 			{
@@ -119,27 +126,38 @@ void mode_choice()
 void catch_the_object()
 {
 		//表示识别成功，或者是收到了给定的xyz值，则开始轨迹规划
-	if(data.start == 1)
+  //获得xyz的值
+	state_check = 0;
+	if((data.x !=0 || data.y !=0) && data.start == 1)
 	{
-		//第一段路径
+		x = data.x;
+		y = data.y;
+		z = data.z;
+		
 		state_check = 1;
-		path_plan(data.x,data.y,data.z,0,10);
+	}
+	if(data.start == 1 && state_check == 1)
+	{
+	 //完成后返回原位置
+		back_to_inital();
+		//第一段路径
+		path_plan(x,y,z,0,3);
 		//夹取目标
-		servos_control(servo_info[1].target_angle,servo_info[1].channel_id);
-    state_check = 2;
+		data.catch_flag = 1;
+    osDelay(3000);
 		//回到目标点
 		back_to_inital();
-		state_check = 3;
-		//第二段路径
-		path_plan(-300,200,10,0,10);
-    state_check = 4;
-		//放下物块
-		servos_control(servo_info[1].target_angle,servo_info[1].channel_id);
+		
+		//第二段路径,将物块放置在
+		path_plan(-300,200,10,0,3);
 
+		//放下物块
+    data.catch_flag = 0;
+    osDelay(3000);
 		//完成后返回原位置
 		back_to_inital();
 
-		
+		state_check = 0;
 		//此处应该设置一个标志位
 	}
 }
@@ -161,7 +179,7 @@ void path_plan(float x,float y,float z,float time_start,float time_final)
 	{
 	  first_path.end.theta[i] = T_res[i];
 	}
-	servo_info[0].target_angle = T_res[4];
+	servo_info[0].target_angle = - T_res[4];
 	//当前角度值
 	first_path.start.theta[0] = motor_info[0].position;
 	first_path.start.theta[1] = -motor_info[1].position;

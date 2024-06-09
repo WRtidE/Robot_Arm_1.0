@@ -7,6 +7,9 @@ typedef __packed struct
   int16_t x;
 	int16_t y;
 	int16_t z;
+	
+	//种类信息
+	int16_t kind;
 
 	
 	//通道值
@@ -23,6 +26,10 @@ typedef __packed struct
  
 	//功能选择
 	int16_t function;
+	
+	//夹取
+	int16_t catch_flag;
+	
 		
 } Control_Data;
 

@@ -42,10 +42,13 @@ void arm_task(void const * argument)
 	 
 		for(;;)
 		{		 
+			//data_send_IT();
 			 //mode_chose();
 			//motor_remote_control();
+
 			motor_control_send();
       osDelay(1);
+			
 		}
 		osDelay(1);
 		
@@ -177,11 +180,7 @@ void motor_remote_control()
 	servo_info[0].target_angle = angle/100;
 	servo_info[1].target_angle = 500 + data.tool * 1000;
 	
-	for(uint16_t i=0;i<4;i++)
-	{
-		motor_info[i].target_speed = 5;
-	}
-	
+
 
 }
 //================================模式3 自动控制====================================
@@ -206,9 +205,9 @@ void motor_control_send()
 		}
 		for(uint16_t i=0;i<4;i++)
 	  {
-		motor_info[i].target_speed = 1;
+		motor_info[i].target_speed = 2;
 	  }
-		servo_info[1].target_angle = 500 + data.tool * 1000;
+		servo_info[1].target_angle = 500 + data.tool * 1000 + data.catch_flag * 1000;
 		
 		PosSpeed_CtrlMotor(&motor_info[0].hcan,motor_info[0].can_id, motor_info[0].target_angle, motor_info[0].target_speed);
 		HAL_Delay(1);

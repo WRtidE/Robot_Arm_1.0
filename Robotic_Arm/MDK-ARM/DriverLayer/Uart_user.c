@@ -12,6 +12,12 @@ uint8_t data_length  = 25;
 uint8_t rx_buffer_ch05[25];
 uint8_t tx_buffer_ch05[25];
 
+//串口5通信
+uint8_t data_length_pc = 10;
+uint8_t rx_buffer_pc[10];
+uint8_t tx_buffrt_pc[10];
+
+
 Control_Data data;
 //测试
 uint8_t flag=0;
@@ -19,11 +25,13 @@ uint8_t flag=0;
 
 void data_receive_IT()
 {
+	
+	HAL_UART_Receive_IT(&huart5,rx_buffer_pc,data_length_pc);
 	//接受空闲中断
   __HAL_UART_ENABLE_IT(&huart6, UART_IT_IDLE); 
-	
 	HAL_UART_Receive_DMA(&huart6, rx_buffer_ch05,data_length);
   HAL_Delay(1000);
+	
 }
 
 
@@ -46,9 +54,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
       if(RxState==1)
       {  
 				//APP数据处理
-				 data.x = (rx_buffer_ch05[2]<<8)|rx_buffer_ch05[1];
-				 data.y = (rx_buffer_ch05[4]<<8)|rx_buffer_ch05[3];
-				 data.z = (rx_buffer_ch05[6]<<8)|rx_buffer_ch05[5];
+//				 data.x = (rx_buffer_ch05[2]<<8)|rx_buffer_ch05[1];
+//				 data.y = (rx_buffer_ch05[4]<<8)|rx_buffer_ch05[3];
+//				 data.z = (rx_buffer_ch05[6]<<8)|rx_buffer_ch05[5];
 				
 				 data.channel[0] = (rx_buffer_ch05[8]<<8)|rx_buffer_ch05[7];
 				 data.channel[1] = (rx_buffer_ch05[10]<<8)|rx_buffer_ch05[9];
@@ -72,15 +80,51 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			}
 		  
 	}	
+		if(huart->Instance==UART5)
+	{	 
+		//接收上位机模块数据包
+    static uint8_t RxState=0;
+		  if(RxState==0)
+      { 
+           if(rx_buffer_pc[0]==0xFE)
+           {
+               RxState=1;
+           } 
+			}
+      if(RxState==1)
+      {  
+				//测试数据 FE 38 FF C8 00 32 00 01 00 EF
+				uint8_t data_rx[8];
+				//APP数据处理
+				 data.x    = (rx_buffer_pc[2]<<8)|rx_buffer_pc[1];
+			   data.y    = (rx_buffer_pc[4]<<8)|rx_buffer_pc[3];
+				 data.z    = (rx_buffer_pc[6]<<8)|rx_buffer_pc[5];
+				 data.kind = (rx_buffer_pc[8]<<8)|rx_buffer_pc[7];
+				
+				//data_rx[0] = data.x>>8;
+				//data_rx[1] = data.x;	
+         RxState=2;
+			}
+      if(RxState==2)
+      {
+          if(rx_buffer_pc[data_length_pc-1]==0xEF)
+         { 
+				   RxState=0;
+				 }
+			}
+	}
+	
+	HAL_UART_Receive_IT(&huart5,rx_buffer_pc,data_length_pc);
 	HAL_UART_Receive_DMA(&huart6,rx_buffer_ch05,data_length);
 }
 
 //中断发送方式
-//void data_send_IT()
-//{
-//	HAL_UART_Transmit_IT(&huart5,(uint8_t*)" Hello ",7);
-//	HAL_Delay(1000);
-//}
+void data_send_IT()
+{
+	HAL_UART_Transmit(&huart5,(uint8_t*)" Hello ",7,0xFFFF);
+	//HAL_UART_Transmit_IT(&huart5,(uint8_t*)" Hello ",7);
+	HAL_Delay(1000);
+}
 
 ////发送数据包
 //void send_packet()

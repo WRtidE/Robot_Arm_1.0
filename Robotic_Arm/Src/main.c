@@ -97,6 +97,7 @@ int main(void)
   MX_CAN1_Init();
   MX_CAN2_Init();
   MX_TIM3_Init();
+  MX_UART5_Init();
   /* USER CODE BEGIN 2 */
 	can_filter_init();
 	data_receive_IT();
