@@ -34,6 +34,10 @@ void data_receive_IT()
 	
 }
 
+void data_receive()
+{
+		HAL_UART_Receive_IT(&huart5,rx_buffer_pc,data_length_pc);
+}
 
 
 //串口接收中断
@@ -94,12 +98,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
       if(RxState==1)
       {  
 				//测试数据 FE 38 FF C8 00 32 00 01 00 EF
+
 				uint8_t data_rx[8];
 				//APP数据处理
-				 data.x    = (rx_buffer_pc[2]<<8)|rx_buffer_pc[1];
-			   data.y    = (rx_buffer_pc[4]<<8)|rx_buffer_pc[3];
-				 data.z    = (rx_buffer_pc[6]<<8)|rx_buffer_pc[5];
-				 data.kind = (rx_buffer_pc[8]<<8)|rx_buffer_pc[7];
+				 data.kind  = (rx_buffer_pc[2]<<8)|rx_buffer_pc[1];
+			   data.y     = (rx_buffer_pc[4]<<8)|rx_buffer_pc[3];//270是摄像头相对于底座的长度
+				 data.x     = (rx_buffer_pc[6]<<8)|rx_buffer_pc[5];
+				 data.z     = (rx_buffer_pc[8]<<8)|rx_buffer_pc[7];
 				
 				//data_rx[0] = data.x>>8;
 				//data_rx[1] = data.x;	

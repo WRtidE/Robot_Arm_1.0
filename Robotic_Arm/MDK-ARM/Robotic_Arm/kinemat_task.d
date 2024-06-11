@@ -57,3 +57,4 @@ robotic_arm\kinemat_task.o: ./Device/Servos.h
 robotic_arm\kinemat_task.o: ./Device/Servos.h
 robotic_arm\kinemat_task.o: ./App/control_data.h
 robotic_arm\kinemat_task.o: ./App/IK.h
+robotic_arm\kinemat_task.o: ../Inc/usart.h

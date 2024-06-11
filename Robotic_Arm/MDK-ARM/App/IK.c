@@ -39,11 +39,6 @@ float arctan(float sa,float ca)
 	}
 	else
 	{
-//	  float ca = fabsf(ca), sa = fabsf(sa);
-//    float temp1 = min(ca, sa)/max(ca, sa);
-//    float temp2 = temp1*temp1;
-//    float result = ((-0.0464964749 * temp2 + 0.15931422) * temp2 - 0.327622764) * temp2 * temp1 + temp1;
-		
 		angle = atan2f(sa,ca);
 	}
 	
@@ -51,6 +46,7 @@ float arctan(float sa,float ca)
 	
 	//abs(cos = 0 的时候，让theta = 0   
 }
+
 
 float Tans[4][5];
 //================================机械臂逆解函数================================
@@ -89,8 +85,7 @@ void IK_calc(float (*T)[4],float *res)
    //================================theta5================================
 	 for(uint16_t i =0;i<2;i++)
 	 {
-		 theta5[i] = 1;
-		 //theta5[i] =  arctan(r21*cos(theta1[i])-r11*sin(theta1[i]),r22*cos(theta1[i])-r12*sin(theta1[i]));
+		 theta5[i] =  arctan(r21*cos(theta1[i])-r11*sin(theta1[i]),r22*cos(theta1[i])-r12*sin(theta1[i]));
 	 }
 	 
 	 theta5[2] = theta5[0];

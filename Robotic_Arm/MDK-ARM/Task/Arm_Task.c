@@ -44,7 +44,7 @@ void arm_task(void const * argument)
 		{		 
 			//data_send_IT();
 			 //mode_chose();
-			//motor_remote_control();
+			motor_remote_control();
 
 			motor_control_send();
       osDelay(1);

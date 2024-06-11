@@ -1529,14 +1529,14 @@
           <GroupName>Bsp</GroupName>
           <Files>
             <File>
-              <FileName>bsp_can.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Bsp\bsp_can.c</FilePath>
-            </File>
-            <File>
               <FileName>struct_typedef.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Bsp\struct_typedef.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Bsp\bsp_can.c</FilePath>
             </File>
           </Files>
         </Group>

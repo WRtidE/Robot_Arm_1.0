@@ -9,7 +9,9 @@
 #include "control_data.h"
 #include "path_planning.h"
 #include "IK.h"
+#include "usart.h"
 
+float stest[3];
 //================================变量定义================================
 //储存几个重要pos
 float inital_pos[5] = {0,0,0,1.5708,0}; //初始位置
@@ -26,6 +28,9 @@ float x,y,z = 0;
 //创建几条轨迹，用来储存轨迹信息
 path first_path;
 path second_path;
+//用来判断是第几个字母
+float letter_last = 0;
+float letter_first= 0;
 
 float state_check = 0;
 static float pi=3.1415;
@@ -58,7 +63,7 @@ void kinemat_task(void const * argument)
 				else if(data.mode == 2 && finish_flag == 0)
 				{
 					path_plan(-200,200,10,0,3);
-					finish_flag = 1;
+					finish_flag = 1;   
 				}
 				else if(data.mode == 0 && finish_flag == 0)
 				{
@@ -125,23 +130,27 @@ void mode_choice()
 //======================模式1 自动夹取物体=========================
 void catch_the_object()
 {
-		//表示识别成功，或者是收到了给定的xyz值，则开始轨迹规划
+
+	//表示识别成功，或者是收到了给定的xyz值，则开始轨迹规划
   //获得xyz的值
 	state_check = 0;
-	if((data.x !=0 || data.y !=0) && data.start == 1)
+	if(data.start == 1 && data.kind !=0)
 	{
 		x = data.x;
-		y = data.y;
-		z = data.z;
+		y = data.y;   
 		
 		state_check = 1;
+		//立即关掉中断
+		__HAL_UART_DISABLE_IT(&huart5, UART_IT_RXNE); //关中断
 	}
 	if(data.start == 1 && state_check == 1)
 	{
+		data.catch_flag = 0;
+    osDelay(3000);
 	 //完成后返回原位置
 		back_to_inital();
 		//第一段路径
-		path_plan(x,y,z,0,3);
+		path_plan(x,y,10,0,3);
 		//夹取目标
 		data.catch_flag = 1;
     osDelay(3000);
@@ -149,7 +158,7 @@ void catch_the_object()
 		back_to_inital();
 		
 		//第二段路径,将物块放置在
-		path_plan(-300,200,10,0,3);
+		path_plan(-150 - 50*data.kind,200,10,0,3);
 
 		//放下物块
     data.catch_flag = 0;
@@ -157,9 +166,14 @@ void catch_the_object()
 		//完成后返回原位置
 		back_to_inital();
 
-		state_check = 0;
+		if(data.kind == 3)
+		{
+				state_check = 0;
+		}
 		//此处应该设置一个标志位
 	}
+	 __HAL_UART_ENABLE_IT(&huart5, UART_IT_RXNE); //开中断
+	data_receive();
 }
 
 ////=====================轨迹规划=========================
@@ -179,11 +193,13 @@ void path_plan(float x,float y,float z,float time_start,float time_final)
 	{
 	  first_path.end.theta[i] = T_res[i];
 	}
-	servo_info[0].target_angle = - T_res[4];
+
+	servo_info[0].target_angle = T_res[4];
+
 	//当前角度值
-	first_path.start.theta[0] = motor_info[0].position;
+	first_path.start.theta[0] =  motor_info[0].position;
 	first_path.start.theta[1] = -motor_info[1].position;
-	first_path.start.theta[2] = motor_info[2].position;
+	first_path.start.theta[2] =  motor_info[2].position;
 	first_path.start.theta[3] = -motor_info[3].position;
 
 		
@@ -230,9 +246,9 @@ void back_to_exit()
 	}
 	servo_info[0].target_angle = 0;
 	//当前角度
-	first_path.start.theta[0] = motor_info[0].position;
+	first_path.start.theta[0] =  motor_info[0].position;
 	first_path.start.theta[1] = -motor_info[1].position;
-	first_path.start.theta[2] = motor_info[2].position;
+	first_path.start.theta[2] =  motor_info[2].position;
 	first_path.start.theta[3] = -motor_info[3].position;
 	
 	//生成轨迹并且开始执行控制
